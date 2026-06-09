@@ -3,9 +3,9 @@
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/flower_sales?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: g1320957780
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/flower_sales?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:g1320957780}
     driver-class-name: com.mysql.cj.jdbc.Driver
   servlet:
     multipart:
@@ -29,6 +29,6 @@ knife4j:
 
 ai:
   deepseek:
-    api-key: sk-0db73d0d9c6d44c5a7a70c4340d86f29
+    api-key: ${AI_DEEPSEEK_API_KEY:}
     base-url: https://api.deepseek.com
     model: deepseek-chat
