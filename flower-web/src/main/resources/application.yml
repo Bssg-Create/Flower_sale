@@ -2,6 +2,12 @@
   port: 8081
 
 spring:
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 7200
+          cache-public: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/flower_sales?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai}
     username: ${SPRING_DATASOURCE_USERNAME:root}
