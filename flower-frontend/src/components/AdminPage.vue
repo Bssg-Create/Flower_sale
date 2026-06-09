@@ -10,7 +10,7 @@
           <button 
             v-for="menu in menuItems" 
             :key="menu.id"
-            @click="currentMenu = menu.id"
+            @click="switchToMenu(menu.id)"
             :class="['menu-btn', { active: currentMenu === menu.id }]"
           >
             {{ menu.icon }} {{ menu.name }}
@@ -185,23 +185,36 @@
           </div>
 
           <div v-else-if="currentMenu === 'diy'" class="diy-management">
-            <div class="diy-grid">
+            <div v-if="diyLoading" class="loading-box">加载中...</div>
+            <div v-else-if="diyList.length === 0" class="empty-box">暂无花束方案数据</div>
+            <div v-else class="diy-grid">
               <div 
                 v-for="diy in diyList" 
                 :key="diy.id"
                 class="diy-card"
               >
                 <div class="diy-preview">
-                  <span class="diy-icon">{{ diy.icon }}</span>
+                  <span class="diy-icon">💐</span>
                 </div>
                 <div class="diy-info">
                   <h4>{{ diy.name }}</h4>
-                  <p class="diy-price">¥{{ diy.price }}</p>
-                  <p class="diy-status">{{ diy.status }}</p>
+                  <p class="diy-user">用户: {{ diy.username }}</p>
+                  <p class="diy-package">包装: {{ diy.packageType || '-' }}</p>
+                  <p class="diy-price">¥{{ (diy.totalPrice || 0).toFixed(2) }}</p>
+                  <p :class="['diy-status-badge', 'status-' + (diy.status || '1')]">
+                    {{ diyStatusText(diy.status) }}
+                  </p>
                 </div>
                 <div class="diy-actions">
-                  <button class="action-btn edit">✏️</button>
-                  <button class="action-btn delete">🗑️</button>
+                  <select
+                    class="status-select"
+                    :value="diy.status"
+                    @change="handleUpdateStatus(diy, $event.target.value)"
+                  >
+                    <option value="1">已保存</option>
+                    <option value="2">已下单</option>
+                  </select>
+                  <button class="action-btn delete" @click="handleDeleteDiy(diy.id)">🗑️</button>
                 </div>
               </div>
             </div>
@@ -213,7 +226,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import api from '../api'
 
 const menuItems = [
   { id: 'dashboard', name: '数据概览', icon: '📊' },
@@ -224,6 +238,7 @@ const menuItems = [
 ]
 
 const currentMenu = ref('dashboard')
+const diyLoading = ref(false)
 
 const currentMenuName = computed(() => {
   const menu = menuItems.find(m => m.id === currentMenu.value)
@@ -253,11 +268,47 @@ const orders = ref([
   { id: 4, orderNo: 'ORD20240104004', userName: 'user003', amount: 320.00, status: 'paid', payStatus: 'paid', createTime: '2024-01-04 16:45' }
 ])
 
-const diyList = ref([
-  { id: 1, name: '情人节花束', icon: '💝', price: 188.00, status: '已保存' },
-  { id: 2, name: '生日花束', icon: '🎂', price: 258.00, status: '已提交' },
-  { id: 3, name: '毕业花束', icon: '🎓', price: 168.00, status: '草稿' }
-])
+const diyList = ref([])
+
+const fetchDiyList = async () => {
+  diyLoading.value = true
+  try {
+    const res = await api.get('/admin/diy/list')
+    const list = res.data.data || []
+    diyList.value = list.map(item => ({
+      ...item,
+      totalPrice: item.totalPrice || 0
+    }))
+  } catch (e) {
+    console.error('获取DIY列表失败', e)
+  } finally {
+    diyLoading.value = false
+  }
+}
+
+const handleDeleteDiy = async (id) => {
+  if (!confirm('确定删除该花束方案？')) return
+  try {
+    await api.delete(`/diy/${id}`)
+    diyList.value = diyList.value.filter(d => d.id !== id)
+  } catch (e) {
+    alert('删除失败: ' + (e.response?.data?.message || e.message))
+  }
+}
+
+const handleUpdateStatus = async (diy, newStatus) => {
+  try {
+    await api.put(`/admin/diy/${diy.id}/status`, { status: newStatus })
+    diy.status = newStatus
+  } catch (e) {
+    alert('状态修改失败: ' + (e.response?.data?.message || e.message))
+  }
+}
+
+const diyStatusText = (status) => {
+  const map = { '1': '已保存', '2': '已下单' }
+  return map[status] || status || '未知'
+}
 
 const getStatusText = (status) => {
   const statusMap = {
@@ -268,6 +319,13 @@ const getStatusText = (status) => {
     'canceled': '已取消'
   }
   return statusMap[status] || status
+}
+
+const switchToMenu = (menuId) => {
+  currentMenu.value = menuId
+  if (menuId === 'diy') {
+    fetchDiyList()
+  }
 }
 </script>
 
@@ -603,6 +661,13 @@ const getStatusText = (status) => {
   padding: 1rem;
 }
 
+.loading-box, .empty-box {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+  font-size: 1rem;
+}
+
 .diy-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -642,6 +707,18 @@ const getStatusText = (status) => {
   margin-bottom: 0.3rem;
 }
 
+.diy-user {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 0.15rem;
+}
+
+.diy-package {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 0.3rem;
+}
+
 .diy-price {
   font-size: 1.1rem;
   font-weight: bold;
@@ -649,13 +726,41 @@ const getStatusText = (status) => {
   margin-bottom: 0.3rem;
 }
 
-.diy-status {
+.diy-status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 12px;
   font-size: 0.8rem;
-  color: #666;
+}
+
+.diy-status-badge.status-1 {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.diy-status-badge.status-2 {
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 .diy-actions {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
+}
+
+.status-select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  background: white;
+  cursor: pointer;
+  color: #555;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #c44569;
 }
 </style>

@@ -8,6 +8,7 @@ public interface DiyBouquetService {
     DiyBouquet createBouquet(DiyBouquet bouquet, List<DiyBouquetItem> items);
     DiyBouquet getBouquetById(Long id);
     List<DiyBouquet> listBouquetsByUser(Long userId);
+    List<DiyBouquet> listAllBouquets();
     boolean deleteBouquet(Long id);
     List<DiyBouquetItem> getBouquetItems(Long bouquetId);
     boolean updateBouquet(DiyBouquet bouquet);

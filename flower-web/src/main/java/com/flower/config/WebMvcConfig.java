@@ -34,7 +34,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/flower/list",
                         "/api/flower/category/list",
                         "/api/diy/package/list",
-                        "/api/diy/flowers"
+                        "/api/diy/flowers",
+                        "/api/ai/chat"
                 );
     }
 }

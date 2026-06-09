@@ -51,6 +51,13 @@ public class DiyBouquetServiceImpl implements DiyBouquetService {
     }
 
     @Override
+    public List<DiyBouquet> listAllBouquets() {
+        LambdaQueryWrapper<DiyBouquet> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(DiyBouquet::getCreateTime);
+        return diyBouquetMapper.selectList(wrapper);
+    }
+
+    @Override
     @Transactional
     public boolean deleteBouquet(Long id) {
         LambdaQueryWrapper<DiyBouquetItem> itemWrapper = new LambdaQueryWrapper<>();

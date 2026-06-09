@@ -39,6 +39,7 @@
         <jwt.version>3.8.1</jwt.version>
         <knife4j.version>4.5.0</knife4j.version>
         <spring.boot.version>3.5.11</spring.boot.version>
+        <okhttp.version>4.12.0</okhttp.version>
     </properties>
 
     <dependencyManagement>
@@ -130,6 +131,16 @@
                 <artifactId>mysql-connector-j</artifactId>
                 <version>8.0.33</version>
                 <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-sse</artifactId>
+                <version>${okhttp.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

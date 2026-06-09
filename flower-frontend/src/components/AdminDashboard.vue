@@ -172,17 +172,21 @@
       <table class="table">
         <thead>
           <tr>
-            <th>ID</th><th>名称</th><th>用户ID</th><th>总价</th><th>包装</th><th>状态</th><th>创建时间</th><th>操作</th>
+            <th>ID</th><th>名称</th><th>用户</th><th>总价</th><th>包装</th><th>状态</th><th>创建时间</th><th>操作</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="d in diyList" :key="d.id">
             <td>{{ d.id }}</td>
             <td>{{ d.name }}</td>
-            <td>{{ d.userId }}</td>
-            <td>¥{{ d.totalPrice?.toFixed(2) }}</td>
+            <td>{{ d.username || '用户' + d.userId }}</td>
+            <td>¥{{ (d.totalPrice || 0).toFixed(2) }}</td>
             <td>{{ d.packageType || '-' }}</td>
-            <td>{{ d.status || '-' }}</td>
+            <td>
+              <span :class="['badge', d.status === '1' ? 'badge-info' : 'badge-active']">
+                {{ d.status === '1' ? '已保存' : d.status === '2' ? '已下单' : (d.status || '-') }}
+              </span>
+            </td>
             <td>{{ d.createTime || '-' }}</td>
             <td>
               <button class="action-btn danger" @click="deleteDiy(d.id)">删除</button>
@@ -244,13 +248,16 @@ const loadData = async () => {
       api.get('/user/list'),
       api.get('/flower/list'),
       api.get('/order/list'),
-      api.get('/diy/list')
+      api.get('/admin/diy/list')
     ]).catch(() => [null, null, null, null])
 
     if (uRes) users.value = uRes.data.data || []
     if (fRes) flowers.value = fRes.data.data || []
     if (oRes) orders.value = (oRes.data.data || []).map(o => ({ ...o, _newStatus: '' }))
-    if (dRes) diyList.value = dRes.data.data || []
+    if (dRes) diyList.value = (dRes.data.data || []).map(d => ({
+      ...d,
+      totalPrice: d.totalPrice || 0
+    }))
 
     stats.value = {
       users: users.value.length,

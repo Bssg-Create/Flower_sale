@@ -25,12 +25,15 @@
     <main class="content">
       <router-view />
     </main>
+
+    <AiAssistant />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import AiAssistant from './AiAssistant.vue'
 
 const router = useRouter()
 const username = ref(localStorage.getItem('username') || '用户')
