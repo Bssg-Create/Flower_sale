@@ -1,4 +1,4 @@
-﻿package com.flower.config;
+package com.flower.config;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.flower.entity.User;
