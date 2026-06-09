@@ -81,7 +81,7 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    const baseUrl = import.meta.env.VITE_API_BASE || 'http://localhost:8081'
+    const baseUrl = import.meta.env.VITE_API_BASE || ''
     const response = await fetch(`${baseUrl}/api/ai/chat?message=${encodeURIComponent(text)}`)
 
     const reader = response.body.getReader()
