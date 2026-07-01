@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DIY花束定制效果预览</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f6f4ef;
+      --surface: #fffefa;
+      --surface-2: #f0f5ee;
+      --line: #ddd7ca;
+      --ink: #25231f;
+      --muted: #746d60;
+      --accent: #b44646;
+      --accent-2: #2f7356;
+      --gold: #c99736;
+      --shadow: 0 16px 40px rgba(48, 41, 32, 0.12);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(120deg, rgba(246, 244, 239, 0.94), rgba(237, 244, 238, 0.96)),
+        radial-gradient(circle at 18% 20%, rgba(180, 70, 70, 0.1), transparent 28%),
+        radial-gradient(circle at 80% 10%, rgba(47, 115, 86, 0.12), transparent 26%);
+    }
+
+    button,
+    select,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      border-bottom: 1px solid rgba(70, 62, 49, 0.12);
+      background: rgba(255, 254, 250, 0.78);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 34%, #f1d1d0 0 16%, transparent 17%),
+        conic-gradient(from 20deg, #b44646, #d98b7d, #e9c98a, #7da985, #b44646);
+      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.72);
+      flex: 0 0 auto;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .icon-btn,
+    .primary-btn,
+    .quiet-btn {
+      height: 38px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .icon-btn {
+      width: 38px;
+      color: var(--ink);
+      background: #ece6dc;
+    }
+
+    .quiet-btn {
+      padding: 0 14px;
+      color: var(--ink);
+      background: #ece6dc;
+    }
+
+    .primary-btn {
+      padding: 0 16px;
+      color: white;
+      background: var(--accent);
+      box-shadow: 0 10px 20px rgba(180, 70, 70, 0.24);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 304px minmax(420px, 1fr) 316px;
+      gap: 18px;
+      padding: 18px;
+      min-height: 0;
+    }
+
+    .panel {
+      min-height: 0;
+      border: 1px solid rgba(70, 62, 49, 0.12);
+      border-radius: 8px;
+      background: rgba(255, 254, 250, 0.92);
+      box-shadow: 0 10px 30px rgba(48, 41, 32, 0.07);
+    }
+
+    .panel-header {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid rgba(70, 62, 49, 0.1);
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .panel-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .flower-panel {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 12px 14px;
+    }
+
+    .filter-row button {
+      height: 34px;
+      border-radius: 8px;
+      color: var(--muted);
+      background: #f0ece4;
+      font-size: 13px;
+    }
+
+    .filter-row button.active {
+      color: white;
+      background: var(--accent-2);
+    }
+
+    .flower-list {
+      overflow: auto;
+      padding: 0 14px 14px;
+    }
+
+    .flower-option {
+      display: grid;
+      grid-template-columns: 50px 1fr 34px;
+      gap: 10px;
+      align-items: center;
+      min-height: 68px;
+      padding: 10px;
+      margin-bottom: 9px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: #f7f3eb;
+      cursor: grab;
+    }
+
+    .flower-option:hover {
+      border-color: rgba(180, 70, 70, 0.25);
+      background: #fff9ef;
+    }
+
+    .mini-flower {
+      position: relative;
+      width: 46px;
+      height: 52px;
+      border-radius: 6px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(234,228,218,0.78));
+      overflow: hidden;
+    }
+
+    .mini-flower::before {
+      content: "";
+      position: absolute;
+      left: 23px;
+      top: 22px;
+      width: 3px;
+      height: 28px;
+      border-radius: 99px;
+      background: #3b7a4d;
+      transform: rotate(8deg);
+      transform-origin: top center;
+    }
+
+    .mini-flower::after {
+      content: "";
+      position: absolute;
+      left: 13px;
+      top: 6px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50% 50% 45% 45%;
+      background:
+        radial-gradient(circle at 52% 52%, var(--flower-core), transparent 0 18%, transparent 19%),
+        radial-gradient(circle at 42% 42%, rgba(255,255,255,0.55), transparent 0 20%, transparent 21%),
+        var(--flower-color);
+      box-shadow:
+        -8px 4px 0 -3px var(--flower-soft),
+        7px 5px 0 -4px var(--flower-deep),
+        0 9px 0 -5px var(--flower-soft);
+    }
+
+    .flower-meta strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .flower-meta span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .add-small {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      color: white;
+      background: var(--accent);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .stage-panel {
+      position: relative;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255, 254, 250, 0.94), rgba(247, 243, 235, 0.94));
+    }
+
+    .stage-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(70, 62, 49, 0.1);
+    }
+
+    .stage-toolbar h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .stage-toolbar span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .canvas-wrap {
+      min-height: 560px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .bouquet-board {
+      position: relative;
+      width: min(92vw, 560px);
+      height: 600px;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0)),
+        radial-gradient(ellipse at 50% 22%, rgba(80, 112, 75, 0.09), transparent 42%),
+        #fbfaf5;
+      border: 1px solid rgba(70, 62, 49, 0.12);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .board-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(72, 65, 54, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(72, 65, 54, 0.045) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(ellipse at center, black, transparent 76%);
+    }
+
+    .drop-hint {
+      position: absolute;
+      left: 50%;
+      top: 74px;
+      transform: translateX(-50%);
+      color: rgba(116, 109, 96, 0.72);
+      font-size: 13px;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .bouquet-board.has-items .drop-hint {
+      opacity: 0;
+    }
+
+    .wrap-layer {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .wrap-back {
+      left: 94px;
+      top: 210px;
+      width: 372px;
+      height: 320px;
+      border-radius: 48% 48% 18% 18%;
+      background: var(--package-back);
+      clip-path: polygon(6% 0, 94% 0, 82% 100%, 18% 100%);
+      box-shadow: inset 0 0 0 1px rgba(75, 66, 54, 0.11);
+      opacity: 0.94;
+    }
+
+    .wrap-left {
+      left: 112px;
+      top: 250px;
+      width: 190px;
+      height: 286px;
+      background: var(--package-left);
+      clip-path: polygon(0 0, 100% 23%, 78% 100%, 16% 88%);
+      transform: rotate(-8deg);
+      box-shadow: -12px 20px 30px rgba(72, 55, 40, 0.14);
+    }
+
+    .wrap-right {
+      right: 112px;
+      top: 250px;
+      width: 190px;
+      height: 286px;
+      background: var(--package-right);
+      clip-path: polygon(0 23%, 100% 0, 84% 88%, 22% 100%);
+      transform: rotate(8deg);
+      box-shadow: 12px 20px 30px rgba(72, 55, 40, 0.14);
+    }
+
+    .wrap-front {
+      left: 154px;
+      top: 324px;
+      width: 252px;
+      height: 238px;
+      background: var(--package-front);
+      clip-path: polygon(6% 0, 94% 0, 76% 100%, 24% 100%);
+      box-shadow: 0 -12px 20px rgba(255,255,255,0.22) inset;
+    }
+
+    .wrap-ribbon {
+      left: 212px;
+      top: 438px;
+      width: 138px;
+      height: 34px;
+      border-radius: 99px;
+      background:
+        linear-gradient(90deg, transparent 0 16%, rgba(255,255,255,0.36) 17% 23%, transparent 24%),
+        var(--ribbon);
+      box-shadow: 0 8px 18px rgba(74, 40, 38, 0.2);
+    }
+
+    .wrap-ribbon::before,
+    .wrap-ribbon::after {
+      content: "";
+      position: absolute;
+      top: 6px;
+      width: 44px;
+      height: 26px;
+      background: var(--ribbon);
+      filter: brightness(0.96);
+    }
+
+    .wrap-ribbon::before {
+      left: -30px;
+      clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%, 28% 50%);
+    }
+
+    .wrap-ribbon::after {
+      right: -30px;
+      clip-path: polygon(0 20%, 100% 0, 72% 50%, 100% 100%, 0 80%);
+    }
+
+    .package-paper {
+      --package-back: linear-gradient(145deg, #efe2cc, #f8f0dd);
+      --package-left: linear-gradient(150deg, #ddc7a7, #f4e7cf);
+      --package-right: linear-gradient(210deg, #ead9bd, #f9efd8);
+      --package-front: linear-gradient(180deg, #f3e5cd, #d8bd94);
+      --ribbon: #b44646;
+    }
+
+    .package-forest {
+      --package-back: linear-gradient(145deg, #c8d7c1, #eef3df);
+      --package-left: linear-gradient(150deg, #8fae8c, #d4e0c7);
+      --package-right: linear-gradient(210deg, #b9ceab, #eef3dd);
+      --package-front: linear-gradient(180deg, #d7e3ca, #92aa82);
+      --ribbon: #345f49;
+    }
+
+    .package-blush {
+      --package-back: linear-gradient(145deg, #f1c7c2, #fff0ea);
+      --package-left: linear-gradient(150deg, #d99899, #f8d5cf);
+      --package-right: linear-gradient(210deg, #eab8b1, #fff0ea);
+      --package-front: linear-gradient(180deg, #f7d4cb, #cf8a86);
+      --ribbon: #8e2f45;
+    }
+
+    .package-gift {
+      --package-back: linear-gradient(145deg, #d8d1e8, #fbf5ff);
+      --package-left: linear-gradient(150deg, #a9a0c7, #e2dcf1);
+      --package-right: linear-gradient(210deg, #c7bfdf, #fbf5ff);
+      --package-front: linear-gradient(180deg, #e8e1f6, #9b90bf);
+      --ribbon: #c99736;
+    }
+
+    .placed-flower {
+      position: absolute;
+      width: 86px;
+      height: 190px;
+      left: 238px;
+      top: 150px;
+      transform-origin: 50% 92%;
+      cursor: move;
+      user-select: none;
+      filter: drop-shadow(0 8px 8px rgba(42, 35, 28, 0.16));
+    }
+
+    .placed-flower.selected {
+      outline: 1px dashed rgba(180, 70, 70, 0.72);
+      outline-offset: 6px;
+      z-index: 999 !important;
+    }
+
+    .placed-flower .stem {
+      position: absolute;
+      left: 40px;
+      top: 52px;
+      width: 6px;
+      height: 128px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #285b3f, #62a06e 58%, #2d6b4a);
+      transform: rotate(var(--stem-bend));
+      transform-origin: top center;
+    }
+
+    .placed-flower .leaf {
+      position: absolute;
+      top: 105px;
+      width: 34px;
+      height: 16px;
+      border-radius: 100% 0 100% 0;
+      background: linear-gradient(135deg, #5e9b64, #2e6b49);
+      opacity: 0.9;
+    }
+
+    .placed-flower .leaf.left {
+      left: 13px;
+      transform: rotate(28deg);
+    }
+
+    .placed-flower .leaf.right {
+      right: 10px;
+      top: 118px;
+      transform: rotate(204deg);
+    }
+
+    .bloom {
+      position: absolute;
+      left: 12px;
+      top: 4px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+    }
+
+    .bloom.rose {
+      background:
+        radial-gradient(circle at 50% 50%, var(--core) 0 10%, transparent 11%),
+        conic-gradient(from 0deg, var(--soft), var(--color), var(--deep), var(--soft), var(--color));
+      box-shadow:
+        -18px 2px 0 -9px var(--soft),
+        15px 4px 0 -10px var(--deep),
+        0 18px 0 -11px var(--soft),
+        2px -14px 0 -12px rgba(255,255,255,0.35);
+    }
+
+    .bloom.tulip {
+      width: 54px;
+      height: 76px;
+      left: 16px;
+      border-radius: 50% 50% 46% 46%;
+      clip-path: polygon(8% 35%, 24% 0, 50% 28%, 78% 0, 94% 35%, 78% 100%, 22% 100%);
+      background: linear-gradient(145deg, var(--soft), var(--color) 48%, var(--deep));
+      box-shadow: inset -8px -8px 18px rgba(0,0,0,0.12);
+    }
+
+    .bloom.lily {
+      background:
+        radial-gradient(circle at 50% 50%, var(--core) 0 11%, transparent 12%),
+        conic-gradient(from 20deg, var(--color) 0 15%, transparent 15% 20%, var(--soft) 20% 35%, transparent 35% 40%, var(--color) 40% 55%, transparent 55% 60%, var(--soft) 60% 75%, transparent 75% 80%, var(--color) 80%);
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.12));
+    }
+
+    .bloom.sun {
+      background:
+        radial-gradient(circle at 50% 50%, #5b3b1f 0 24%, transparent 25%),
+        repeating-conic-gradient(#f2bd2e 0 12deg, #e28c27 12deg 22deg);
+      border-radius: 50%;
+    }
+
+    .bloom.greenery {
+      width: 56px;
+      height: 92px;
+      left: 16px;
+      top: 0;
+      background:
+        radial-gradient(ellipse at 28% 30%, #95b98c 0 18%, transparent 19%),
+        radial-gradient(ellipse at 70% 38%, #6f9c72 0 20%, transparent 21%),
+        radial-gradient(ellipse at 32% 62%, #89ad7f 0 19%, transparent 20%),
+        radial-gradient(ellipse at 70% 70%, #537f5a 0 16%, transparent 17%);
+      border-radius: 24px;
+    }
+
+    .handle-dot {
+      display: none;
+      position: absolute;
+      right: -16px;
+      top: -14px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+
+    .placed-flower.selected .handle-dot {
+      display: flex;
+    }
+
+    .inspector-panel {
+      display: grid;
+      grid-template-rows: auto auto auto 1fr auto;
+      overflow: hidden;
+    }
+
+    .package-list {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .package-option {
+      display: grid;
+      grid-template-columns: 62px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid rgba(70, 62, 49, 0.1);
+      border-radius: 8px;
+      background: #f8f4ec;
+      text-align: left;
+    }
+
+    .package-option.active {
+      border-color: rgba(180, 70, 70, 0.54);
+      box-shadow: 0 0 0 3px rgba(180, 70, 70, 0.08);
+      background: #fffaf3;
+    }
+
+    .package-swatch {
+      height: 52px;
+      border-radius: 8px;
+      background: var(--swatch);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .package-swatch::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 28px;
+      width: 50px;
+      height: 16px;
+      border-radius: 99px;
+      background: var(--ribbon-color);
+      transform: translateX(-50%);
+    }
+
+    .package-name strong,
+    .summary-row strong {
+      font-size: 14px;
+    }
+
+    .package-name span,
+    .summary-row span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section-block {
+      padding: 14px;
+      border-top: 1px solid rgba(70, 62, 49, 0.1);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .section-title h3 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .tool-grid button {
+      height: 36px;
+      border-radius: 8px;
+      color: var(--ink);
+      background: #ece6dc;
+      font-size: 16px;
+    }
+
+    .range-row {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .range-row label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .recipe-list {
+      overflow: auto;
+      padding: 0 14px 14px;
+    }
+
+    .recipe-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(70, 62, 49, 0.09);
+      font-size: 13px;
+    }
+
+    .recipe-item span {
+      color: var(--muted);
+    }
+
+    .summary {
+      padding: 14px;
+      border-top: 1px solid rgba(70, 62, 49, 0.1);
+      background: rgba(240, 245, 238, 0.72);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0;
+    }
+
+    .summary-total {
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(70, 62, 49, 0.13);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .empty-state {
+      padding: 22px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1120px) {
+      .workspace {
+        grid-template-columns: 280px 1fr;
+      }
+
+      .inspector-panel {
+        grid-column: 1 / -1;
+        grid-template-rows: auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        height: auto;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 16px;
+        flex-direction: column;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+        padding: 12px;
+      }
+
+      .canvas-wrap {
+        min-height: 500px;
+        padding: 10px;
+      }
+
+      .bouquet-board {
+        width: 100%;
+        height: 520px;
+      }
+
+      .wrap-back {
+        left: 16%;
+        width: 68%;
+      }
+
+      .wrap-left {
+        left: 20%;
+      }
+
+      .wrap-right {
+        right: 20%;
+      }
+
+      .wrap-front {
+        left: 28%;
+        width: 44%;
+      }
+
+      .wrap-ribbon {
+        left: calc(50% - 69px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          <h1>DIY花束定制工作台</h1>
+          <p>预览稿：挑选花材、选择包装、自由摆放并保存设计构图</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="quiet-btn" id="presetBtn" type="button">生成示例花束</button>
+        <button class="icon-btn" id="clearBtn" type="button" title="清空画布" aria-label="清空画布">×</button>
+        <button class="primary-btn" type="button">保存设计</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="panel flower-panel">
+        <div class="panel-header">
+          <h2>花材架</h2>
+          <p>点击加号或拖拽到中间工作台。每一支花都可以单独移动、旋转和缩放。</p>
+        </div>
+        <div class="filter-row" id="filters"></div>
+        <div class="flower-list" id="flowerList"></div>
+      </aside>
+
+      <section class="panel stage-panel">
+        <div class="stage-toolbar">
+          <div>
+            <h2>花束工作台</h2>
+            <span>花材会从束口处向上展开，包装层在底部承托视觉重心</span>
+          </div>
+          <button class="quiet-btn" id="centerBtn" type="button">居中整理</button>
+        </div>
+        <div class="canvas-wrap">
+          <div class="bouquet-board package-paper" id="board">
+            <div class="board-grid"></div>
+            <div class="drop-hint">从左侧拖入花材，或点击花材旁的加号</div>
+            <div id="flowerLayer"></div>
+            <div class="wrap-layer wrap-back"></div>
+            <div class="wrap-layer wrap-left"></div>
+            <div class="wrap-layer wrap-right"></div>
+            <div class="wrap-layer wrap-front"></div>
+            <div class="wrap-layer wrap-ribbon"></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel inspector-panel">
+        <div class="panel-header">
+          <h2>包装与调整</h2>
+          <p>包装会改变纸张质感、色彩和缎带，花束总价实时更新。</p>
+        </div>
+        <div class="package-list" id="packageList"></div>
+
+        <div class="section-block">
+          <div class="section-title">
+            <h3>选中花材</h3>
+            <span id="selectedName">未选择</span>
+          </div>
+          <div class="tool-grid">
+            <button id="bringForwardBtn" type="button" title="上移一层" aria-label="上移一层">↑</button>
+            <button id="sendBackwardBtn" type="button" title="下移一层" aria-label="下移一层">↓</button>
+            <button id="duplicateBtn" type="button" title="复制" aria-label="复制">⧉</button>
+            <button id="deleteBtn" type="button" title="删除" aria-label="删除">⌫</button>
+          </div>
+          <div class="range-row">
+            <label for="rotateRange"><span>旋转角度</span><strong id="rotateValue">0°</strong></label>
+            <input id="rotateRange" type="range" min="-60" max="60" value="0" step="1" />
+          </div>
+          <div class="range-row">
+            <label for="scaleRange"><span>花材大小</span><strong id="scaleValue">100%</strong></label>
+            <input id="scaleRange" type="range" min="70" max="145" value="100" step="1" />
+          </div>
+        </div>
+
+        <div class="panel-header">
+          <h2>花束清单</h2>
+          <p>这里用于模拟保存前的方案明细。</p>
+        </div>
+        <div class="recipe-list" id="recipeList"></div>
+
+        <div class="summary">
+          <div class="summary-row">
+            <span>花材数量</span>
+            <strong id="countText">0支</strong>
+          </div>
+          <div class="summary-row">
+            <span>花材费用</span>
+            <strong id="flowerTotal">¥0.00</strong>
+          </div>
+          <div class="summary-row">
+            <span>包装费用</span>
+            <strong id="packageTotal">¥10.00</strong>
+          </div>
+          <div class="summary-row summary-total">
+            <span>预计总价</span>
+            <strong id="totalText">¥10.00</strong>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const flowers = [
+      { id: "red-rose", name: "红玫瑰", category: "玫瑰", price: 15, form: "rose", color: "#c73536", soft: "#ee7770", deep: "#8b1f2f", core: "#5d1020" },
+      { id: "white-rose", name: "白玫瑰", category: "玫瑰", price: 14, form: "rose", color: "#f6f1e8", soft: "#ffffff", deep: "#d8d0c1", core: "#c99736" },
+      { id: "pink-rose", name: "粉玫瑰", category: "玫瑰", price: 15, form: "rose", color: "#e98d9f", soft: "#ffc3cf", deep: "#bf5c73", core: "#88495b" },
+      { id: "pink-tulip", name: "粉郁金香", category: "郁金香", price: 18, form: "tulip", color: "#e987b0", soft: "#ffc7dc", deep: "#ba5984", core: "#b44646" },
+      { id: "yellow-tulip", name: "黄郁金香", category: "郁金香", price: 18, form: "tulip", color: "#efc04b", soft: "#ffe082", deep: "#c78922", core: "#8a5a18" },
+      { id: "white-lily", name: "白百合", category: "百合", price: 20, form: "lily", color: "#faf8ed", soft: "#ffffff", deep: "#e4dac3", core: "#c99736" },
+      { id: "pink-lily", name: "粉百合", category: "百合", price: 22, form: "lily", color: "#f0a5b4", soft: "#ffd1d8", deep: "#bd6a7e", core: "#a86a2f" },
+      { id: "sunflower", name: "向日葵", category: "主花", price: 12, form: "sun", color: "#f2bd2e", soft: "#ffdb62", deep: "#d98b23", core: "#5b3b1f" },
+      { id: "carnation", name: "康乃馨", category: "主花", price: 12, form: "rose", color: "#d95b77", soft: "#ff9caf", deep: "#a93b5b", core: "#7a2a43" },
+      { id: "daisy", name: "小雏菊", category: "配花", price: 8, form: "lily", color: "#fffdf3", soft: "#ffffff", deep: "#ece1c0", core: "#e7b72f" },
+      { id: "eucalyptus", name: "尤加利叶", category: "配叶", price: 5, form: "greenery", color: "#6f9c72", soft: "#95b98c", deep: "#537f5a", core: "#2f7356" }
+    ];
+
+    const packages = [
+      { id: "paper", name: "米色韩式包装", price: 10, className: "package-paper", swatch: "linear-gradient(135deg,#ddc7a7,#f8f0dd)", ribbon: "#b44646" },
+      { id: "forest", name: "森系雾绿包装", price: 12, className: "package-forest", swatch: "linear-gradient(135deg,#8fae8c,#eef3dd)", ribbon: "#345f49" },
+      { id: "blush", name: "豆沙粉包装", price: 15, className: "package-blush", swatch: "linear-gradient(135deg,#d99899,#fff0ea)", ribbon: "#8e2f45" },
+      { id: "gift", name: "礼盒感紫灰包装", price: 20, className: "package-gift", swatch: "linear-gradient(135deg,#a9a0c7,#fbf5ff)", ribbon: "#c99736" }
+    ];
+
+    const state = {
+      category: "全部",
+      packageId: "paper",
+      items: [],
+      selectedId: null,
+      drag: null,
+      nextId: 1
+    };
+
+    const board = document.getElementById("board");
+    const flowerList = document.getElementById("flowerList");
+    const filters = document.getElementById("filters");
+    const flowerLayer = document.getElementById("flowerLayer");
+    const packageList = document.getElementById("packageList");
+    const recipeList = document.getElementById("recipeList");
+    const selectedName = document.getElementById("selectedName");
+    const rotateRange = document.getElementById("rotateRange");
+    const scaleRange = document.getElementById("scaleRange");
+    const rotateValue = document.getElementById("rotateValue");
+    const scaleValue = document.getElementById("scaleValue");
+
+    function money(value) {
+      return "¥" + value.toFixed(2);
+    }
+
+    function renderFilters() {
+      const cats = ["全部", "玫瑰", "郁金香", "百合", "主花", "配花", "配叶"];
+      filters.innerHTML = cats.map(cat => (
+        `<button type="button" class="${state.category === cat ? "active" : ""}" data-cat="${cat}">${cat}</button>`
+      )).join("");
+    }
+
+    function flowerStyleVars(flower) {
+      return `--flower-color:${flower.color};--flower-soft:${flower.soft};--flower-deep:${flower.deep};--flower-core:${flower.core};`;
+    }
+
+    function renderFlowerList() {
+      const visible = state.category === "全部" ? flowers : flowers.filter(f => f.category === state.category);
+      flowerList.innerHTML = visible.map(flower => `
+        <div class="flower-option" draggable="true" data-flower-id="${flower.id}" style="${flowerStyleVars(flower)}">
+          <div class="mini-flower" aria-hidden="true"></div>
+          <div class="flower-meta">
+            <strong>${flower.name}</strong>
+            <span>${flower.category} / ${money(flower.price)} 每支</span>
+          </div>
+          <button class="add-small" type="button" data-add-id="${flower.id}" aria-label="加入${flower.name}">+</button>
+        </div>
+      `).join("");
+    }
+
+    function renderPackages() {
+      packageList.innerHTML = packages.map(pkg => `
+        <button type="button" class="package-option ${state.packageId === pkg.id ? "active" : ""}" data-package-id="${pkg.id}">
+          <span class="package-swatch" style="--swatch:${pkg.swatch};--ribbon-color:${pkg.ribbon};"></span>
+          <span class="package-name"><strong>${pkg.name}</strong><span>${money(pkg.price)}</span></span>
+          <span>${state.packageId === pkg.id ? "已选" : "选择"}</span>
+        </button>
+      `).join("");
+    }
+
+    function selectedItem() {
+      return state.items.find(item => item.uid === state.selectedId) || null;
+    }
+
+    function createFlowerNode(item) {
+      const flower = flowers.find(f => f.id === item.flowerId);
+      const node = document.createElement("div");
+      node.className = "placed-flower" + (item.uid === state.selectedId ? " selected" : "");
+      node.dataset.uid = item.uid;
+      node.style.left = item.x + "px";
+      node.style.top = item.y + "px";
+      node.style.zIndex = String(item.z);
+      node.style.setProperty("--color", flower.color);
+      node.style.setProperty("--soft", flower.soft);
+      node.style.setProperty("--deep", flower.deep);
+      node.style.setProperty("--core", flower.core);
+      node.style.setProperty("--stem-bend", item.bend + "deg");
+      node.style.transform = `rotate(${item.rotation}deg) scale(${item.scale})`;
+      node.innerHTML = `
+        <div class="stem"></div>
+        <div class="leaf left"></div>
+        <div class="leaf right"></div>
+        <div class="bloom ${flower.form}"></div>
+        <div class="handle-dot" aria-hidden="true">↻</div>
+      `;
+      return node;
+    }
+
+    function renderBoard() {
+      flowerLayer.innerHTML = "";
+      board.classList.toggle("has-items", state.items.length > 0);
+      state.items
+        .slice()
+        .sort((a, b) => a.z - b.z)
+        .forEach(item => flowerLayer.appendChild(createFlowerNode(item)));
+
+      const pkg = packages.find(p => p.id === state.packageId);
+      board.className = "bouquet-board " + pkg.className + (state.items.length ? " has-items" : "");
+    }
+
+    function renderRecipe() {
+      if (state.items.length === 0) {
+        recipeList.innerHTML = `<div class="empty-state">还没有加入花材。先从左侧挑选几支主花，再用配叶补出层次。</div>`;
+      } else {
+        const rows = flowers
+          .map(flower => {
+            const count = state.items.filter(item => item.flowerId === flower.id).length;
+            return { flower, count };
+          })
+          .filter(row => row.count > 0);
+        recipeList.innerHTML = rows.map(row => `
+          <div class="recipe-item">
+            <strong>${row.flower.name}</strong>
+            <span>${row.count}支 / ${money(row.count * row.flower.price)}</span>
+          </div>
+        `).join("");
+      }
+
+      const flowerTotal = state.items.reduce((sum, item) => {
+        const flower = flowers.find(f => f.id === item.flowerId);
+        return sum + flower.price;
+      }, 0);
+      const pkg = packages.find(p => p.id === state.packageId);
+      document.getElementById("countText").textContent = state.items.length + "支";
+      document.getElementById("flowerTotal").textContent = money(flowerTotal);
+      document.getElementById("packageTotal").textContent = money(pkg.price);
+      document.getElementById("totalText").textContent = money(flowerTotal + pkg.price);
+    }
+
+    function renderInspector() {
+      const item = selectedItem();
+      if (!item) {
+        selectedName.textContent = "未选择";
+        rotateRange.value = "0";
+        scaleRange.value = "100";
+        rotateValue.textContent = "0°";
+        scaleValue.textContent = "100%";
+        return;
+      }
+      const flower = flowers.find(f => f.id === item.flowerId);
+      selectedName.textContent = flower.name;
+      rotateRange.value = String(item.rotation);
+      scaleRange.value = String(Math.round(item.scale * 100));
+      rotateValue.textContent = item.rotation + "°";
+      scaleValue.textContent = Math.round(item.scale * 100) + "%";
+    }
+
+    function renderAll() {
+      renderFilters();
+      renderFlowerList();
+      renderPackages();
+      renderBoard();
+      renderRecipe();
+      renderInspector();
+    }
+
+    function boardPoint(clientX, clientY) {
+      const rect = board.getBoundingClientRect();
+      return {
+        x: Math.max(24, Math.min(clientX - rect.left - 43, rect.width - 110)),
+        y: Math.max(18, Math.min(clientY - rect.top - 94, rect.height - 220))
+      };
+    }
+
+    function addFlower(flowerId, position) {
+      const item = {
+        uid: "f" + state.nextId++,
+        flowerId,
+        x: position?.x ?? 238 + (state.items.length % 5 - 2) * 26,
+        y: position?.y ?? 134 + Math.floor(state.items.length / 5) * 18,
+        rotation: position?.rotation ?? [-18, 12, -8, 18, 4][state.items.length % 5],
+        scale: position?.scale ?? 1,
+        z: position?.z ?? 20 + state.items.length,
+        bend: [-4, 3, 7, -8, 2][state.items.length % 5]
+      };
+      state.items.push(item);
+      state.selectedId = item.uid;
+      renderAll();
+    }
+
+    function updateSelected(patch) {
+      const item = selectedItem();
+      if (!item) return;
+      Object.assign(item, patch);
+      renderAll();
+    }
+
+    function removeSelected() {
+      if (!state.selectedId) return;
+      state.items = state.items.filter(item => item.uid !== state.selectedId);
+      state.selectedId = null;
+      renderAll();
+    }
+
+    function duplicateSelected() {
+      const item = selectedItem();
+      if (!item) return;
+      addFlower(item.flowerId, {
+        x: item.x + 22,
+        y: item.y + 10,
+        rotation: item.rotation + 6,
+        scale: item.scale,
+        z: Math.max(...state.items.map(i => i.z)) + 1
+      });
+    }
+
+    function shiftLayer(direction) {
+      const item = selectedItem();
+      if (!item) return;
+      item.z += direction;
+      renderAll();
+    }
+
+    function centerArrange() {
+      const count = state.items.length;
+      if (!count) return;
+      state.items.forEach((item, index) => {
+        const offset = index - (count - 1) / 2;
+        item.x = 238 + offset * 22;
+        item.y = 118 + Math.abs(offset) * 9 + (index % 3) * 8;
+        item.rotation = Math.round(offset * 8);
+        item.z = 30 + index;
+      });
+      renderAll();
+    }
+
+    function loadPreset() {
+      state.items = [];
+      state.selectedId = null;
+      state.nextId = 1;
+      state.packageId = "forest";
+      [
+        ["eucalyptus", 186, 112, -24, 1.08, 10],
+        ["eucalyptus", 296, 108, 24, 1.04, 11],
+        ["white-lily", 216, 118, -10, 1.04, 18],
+        ["sunflower", 264, 104, 8, 1.08, 20],
+        ["red-rose", 238, 138, -2, 1.12, 24],
+        ["pink-rose", 194, 156, -18, 0.96, 22],
+        ["pink-tulip", 306, 154, 18, 0.98, 23],
+        ["daisy", 154, 182, -28, 0.88, 16],
+        ["daisy", 342, 182, 30, 0.88, 17]
+      ].forEach(row => addFlower(row[0], { x: row[1], y: row[2], rotation: row[3], scale: row[4], z: row[5] }));
+      state.selectedId = state.items[4]?.uid || null;
+      renderAll();
+    }
+
+    filters.addEventListener("click", event => {
+      const button = event.target.closest("button[data-cat]");
+      if (!button) return;
+      state.category = button.dataset.cat;
+      renderAll();
+    });
+
+    flowerList.addEventListener("click", event => {
+      const button = event.target.closest("button[data-add-id]");
+      if (!button) return;
+      addFlower(button.dataset.addId);
+    });
+
+    flowerList.addEventListener("dragstart", event => {
+      const option = event.target.closest("[data-flower-id]");
+      if (!option) return;
+      event.dataTransfer.setData("text/plain", option.dataset.flowerId);
+      event.dataTransfer.effectAllowed = "copy";
+    });
+
+    board.addEventListener("dragover", event => {
+      event.preventDefault();
+    });
+
+    board.addEventListener("drop", event => {
+      event.preventDefault();
+      const flowerId = event.dataTransfer.getData("text/plain");
+      if (!flowerId) return;
+      addFlower(flowerId, boardPoint(event.clientX, event.clientY));
+    });
+
+    packageList.addEventListener("click", event => {
+      const button = event.target.closest("[data-package-id]");
+      if (!button) return;
+      state.packageId = button.dataset.packageId;
+      renderAll();
+    });
+
+    flowerLayer.addEventListener("pointerdown", event => {
+      const node = event.target.closest(".placed-flower");
+      if (!node) return;
+      const item = state.items.find(entry => entry.uid === node.dataset.uid);
+      state.selectedId = item.uid;
+      const rect = board.getBoundingClientRect();
+      state.drag = {
+        uid: item.uid,
+        dx: event.clientX - rect.left - item.x,
+        dy: event.clientY - rect.top - item.y
+      };
+      node.setPointerCapture(event.pointerId);
+      renderAll();
+    });
+
+    flowerLayer.addEventListener("pointermove", event => {
+      if (!state.drag) return;
+      const item = state.items.find(entry => entry.uid === state.drag.uid);
+      if (!item) return;
+      const rect = board.getBoundingClientRect();
+      item.x = Math.max(24, Math.min(event.clientX - rect.left - state.drag.dx, rect.width - 110));
+      item.y = Math.max(18, Math.min(event.clientY - rect.top - state.drag.dy, rect.height - 220));
+      item.z = Math.round(item.y);
+      renderBoard();
+      renderRecipe();
+    });
+
+    flowerLayer.addEventListener("pointerup", () => {
+      state.drag = null;
+    });
+
+    board.addEventListener("click", event => {
+      if (event.target.closest(".placed-flower")) return;
+      state.selectedId = null;
+      renderAll();
+    });
+
+    rotateRange.addEventListener("input", event => {
+      updateSelected({ rotation: Number(event.target.value) });
+    });
+
+    scaleRange.addEventListener("input", event => {
+      updateSelected({ scale: Number(event.target.value) / 100 });
+    });
+
+    document.getElementById("deleteBtn").addEventListener("click", removeSelected);
+    document.getElementById("duplicateBtn").addEventListener("click", duplicateSelected);
+    document.getElementById("bringForwardBtn").addEventListener("click", () => shiftLayer(8));
+    document.getElementById("sendBackwardBtn").addEventListener("click", () => shiftLayer(-8));
+    document.getElementById("centerBtn").addEventListener("click", centerArrange);
+    document.getElementById("presetBtn").addEventListener("click", loadPreset);
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      state.items = [];
+      state.selectedId = null;
+      renderAll();
+    });
+
+    renderAll();
+    loadPreset();
+  </script>
+</body>
+</html>
