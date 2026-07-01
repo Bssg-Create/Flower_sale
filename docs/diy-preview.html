@@ -34,7 +34,8 @@
 
     button,
     select,
-    input {
+    input,
+    textarea {
       font: inherit;
     }
 
@@ -134,6 +135,71 @@
       gap: 18px;
       padding: 18px;
       min-height: 0;
+    }
+
+    .template-strip {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1px solid rgba(70, 62, 49, 0.12);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,254,250,0.94), rgba(246,241,232,0.9)),
+        repeating-linear-gradient(90deg, rgba(111, 88, 57, 0.035) 0 1px, transparent 1px 22px);
+      box-shadow: 0 10px 30px rgba(48, 41, 32, 0.06);
+    }
+
+    .template-copy strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .template-copy span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .template-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .template-card {
+      min-height: 72px;
+      padding: 10px;
+      border: 1px solid rgba(70, 62, 49, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 254, 250, 0.82);
+      text-align: left;
+      box-shadow: 0 6px 16px rgba(68, 51, 32, 0.05);
+    }
+
+    .template-card.active {
+      border-color: rgba(180, 70, 70, 0.48);
+      box-shadow: 0 0 0 3px rgba(180, 70, 70, 0.08);
+      background: #fffaf3;
+    }
+
+    .template-card strong,
+    .template-card span {
+      display: block;
+    }
+
+    .template-card strong {
+      font-size: 13px;
+    }
+
+    .template-card span {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
     }
 
     .panel {
@@ -283,6 +349,26 @@
       margin-top: 5px;
       color: var(--muted);
       font-size: 12px;
+    }
+
+    .flower-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 7px;
+    }
+
+    .flower-tags em,
+    .mood-tags span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 0 7px;
+      border-radius: 999px;
+      color: #5f4f3b;
+      background: rgba(201, 151, 54, 0.15);
+      font-size: 11px;
+      font-style: normal;
     }
 
     .add-small {
@@ -489,6 +575,41 @@
     .wrap-ribbon::after {
       right: -30px;
       clip-path: polygon(0 20%, 100% 0, 72% 50%, 100% 100%, 0 80%);
+    }
+
+    .message-card {
+      position: absolute;
+      right: 124px;
+      top: 408px;
+      width: 102px;
+      min-height: 68px;
+      padding: 12px 10px 10px;
+      border-radius: 6px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.92), rgba(248,240,221,0.96)),
+        repeating-linear-gradient(0deg, rgba(151, 123, 84, 0.08) 0 1px, transparent 1px 12px);
+      border: 1px solid rgba(105, 84, 56, 0.16);
+      box-shadow: 0 12px 22px rgba(64, 45, 27, 0.18);
+      color: #5f4f3b;
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: center;
+      transform: rotate(7deg);
+      z-index: 8;
+      pointer-events: none;
+    }
+
+    .message-card::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -7px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--ribbon);
+      transform: translateX(-50%);
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,0.45);
     }
 
     .package-paper {
@@ -770,6 +891,45 @@
       margin-top: 12px;
     }
 
+    .mood-panel {
+      display: grid;
+      gap: 8px;
+    }
+
+    .mood-panel strong {
+      font-size: 13px;
+    }
+
+    .mood-panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .mood-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .card-input {
+      display: grid;
+      gap: 8px;
+    }
+
+    .card-input textarea {
+      width: 100%;
+      min-height: 74px;
+      resize: vertical;
+      border: 1px solid rgba(70, 62, 49, 0.16);
+      border-radius: 8px;
+      padding: 9px 10px;
+      color: var(--ink);
+      background: #fffefa;
+      line-height: 1.5;
+    }
+
     .range-row label {
       display: flex;
       justify-content: space-between;
@@ -834,6 +994,10 @@
         grid-template-columns: 280px 1fr;
       }
 
+      .template-strip {
+        grid-template-columns: 1fr;
+      }
+
       .inspector-panel {
         grid-column: 1 / -1;
         grid-template-rows: auto;
@@ -852,6 +1016,10 @@
       .workspace {
         grid-template-columns: 1fr;
         padding: 12px;
+      }
+
+      .template-list {
+        grid-template-columns: 1fr;
       }
 
       .canvas-wrap {
@@ -899,13 +1067,21 @@
         </div>
       </div>
       <div class="top-actions">
-        <button class="quiet-btn" id="presetBtn" type="button">生成示例花束</button>
+        <button class="quiet-btn" id="presetBtn" type="button">换一组灵感</button>
         <button class="icon-btn" id="clearBtn" type="button" title="清空画布" aria-label="清空画布">×</button>
         <button class="primary-btn" type="button">保存设计</button>
       </div>
     </header>
 
     <main class="workspace">
+      <section class="template-strip" aria-label="花束风格模板">
+        <div class="template-copy">
+          <strong>花艺灵感模板</strong>
+          <span>一键套用不同场景的花材、包装和构图，再继续自由调整。</span>
+        </div>
+        <div class="template-list" id="templateList"></div>
+      </section>
+
       <aside class="panel flower-panel">
         <div class="panel-header">
           <h2>花材架</h2>
@@ -921,7 +1097,7 @@
             <h2>花束工作台</h2>
             <span>花材从束口向上展开，包装纸在前景形成承托和遮挡</span>
           </div>
-          <button class="quiet-btn" id="centerBtn" type="button">居中整理</button>
+          <button class="quiet-btn" id="centerBtn" type="button">花艺师整理</button>
         </div>
         <div class="canvas-wrap">
           <div class="bouquet-board package-paper" id="board">
@@ -933,6 +1109,7 @@
             <div class="wrap-layer wrap-right"></div>
             <div class="wrap-layer wrap-front"></div>
             <div class="wrap-layer wrap-ribbon"></div>
+            <div class="message-card" id="messageCard">愿今日有花，也有好心情</div>
           </div>
         </div>
       </section>
@@ -943,6 +1120,17 @@
           <p>切换纸样、缎带和花材姿态，预估价格会同步变化。</p>
         </div>
         <div class="package-list" id="packageList"></div>
+
+        <div class="section-block">
+          <div class="section-title">
+            <h3>花语场景</h3>
+            <span id="sceneText">自动识别</span>
+          </div>
+          <div class="mood-panel">
+            <div class="mood-tags" id="moodTags"></div>
+            <p id="moodCopy">加入花材后，会根据花材组合显示适合的赠花场景。</p>
+          </div>
+        </div>
 
         <div class="section-block">
           <div class="section-title">
@@ -963,6 +1151,16 @@
             <label for="scaleRange"><span>花材大小</span><strong id="scaleValue">100%</strong></label>
             <input id="scaleRange" type="range" min="70" max="145" value="100" step="1" />
           </div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-title">
+            <h3>祝福卡片</h3>
+            <span>随花束展示</span>
+          </div>
+          <label class="card-input" for="messageInput">
+            <textarea id="messageInput" maxlength="36">愿今日有花，也有好心情</textarea>
+          </label>
         </div>
 
         <div class="panel-header">
@@ -995,17 +1193,17 @@
 
   <script>
     const flowers = [
-      { id: "red-rose", name: "红玫瑰", category: "玫瑰", price: 15, form: "rose", color: "#c73536", soft: "#ee7770", deep: "#8b1f2f", core: "#5d1020" },
-      { id: "white-rose", name: "白玫瑰", category: "玫瑰", price: 14, form: "rose", color: "#f6f1e8", soft: "#ffffff", deep: "#d8d0c1", core: "#c99736" },
-      { id: "pink-rose", name: "粉玫瑰", category: "玫瑰", price: 15, form: "rose", color: "#e98d9f", soft: "#ffc3cf", deep: "#bf5c73", core: "#88495b" },
-      { id: "pink-tulip", name: "粉郁金香", category: "郁金香", price: 18, form: "tulip", color: "#e987b0", soft: "#ffc7dc", deep: "#ba5984", core: "#b44646" },
-      { id: "yellow-tulip", name: "黄郁金香", category: "郁金香", price: 18, form: "tulip", color: "#efc04b", soft: "#ffe082", deep: "#c78922", core: "#8a5a18" },
-      { id: "white-lily", name: "白百合", category: "百合", price: 20, form: "lily", color: "#faf8ed", soft: "#ffffff", deep: "#e4dac3", core: "#c99736" },
-      { id: "pink-lily", name: "粉百合", category: "百合", price: 22, form: "lily", color: "#f0a5b4", soft: "#ffd1d8", deep: "#bd6a7e", core: "#a86a2f" },
-      { id: "sunflower", name: "向日葵", category: "主花", price: 12, form: "sun", color: "#f2bd2e", soft: "#ffdb62", deep: "#d98b23", core: "#5b3b1f" },
-      { id: "carnation", name: "康乃馨", category: "主花", price: 12, form: "rose", color: "#d95b77", soft: "#ff9caf", deep: "#a93b5b", core: "#7a2a43" },
-      { id: "daisy", name: "小雏菊", category: "配花", price: 8, form: "lily", color: "#fffdf3", soft: "#ffffff", deep: "#ece1c0", core: "#e7b72f" },
-      { id: "eucalyptus", name: "尤加利叶", category: "配叶", price: 5, form: "greenery", color: "#6f9c72", soft: "#95b98c", deep: "#537f5a", core: "#2f7356" }
+      { id: "red-rose", name: "红玫瑰", category: "玫瑰", price: 15, form: "rose", color: "#c73536", soft: "#ee7770", deep: "#8b1f2f", core: "#5d1020", tags: ["热恋", "告白"] },
+      { id: "white-rose", name: "白玫瑰", category: "玫瑰", price: 14, form: "rose", color: "#f6f1e8", soft: "#ffffff", deep: "#d8d0c1", core: "#c99736", tags: ["纯净", "纪念"] },
+      { id: "pink-rose", name: "粉玫瑰", category: "玫瑰", price: 15, form: "rose", color: "#e98d9f", soft: "#ffc3cf", deep: "#bf5c73", core: "#88495b", tags: ["温柔", "心意"] },
+      { id: "pink-tulip", name: "粉郁金香", category: "郁金香", price: 18, form: "tulip", color: "#e987b0", soft: "#ffc7dc", deep: "#ba5984", core: "#b44646", tags: ["浪漫", "春日"] },
+      { id: "yellow-tulip", name: "黄郁金香", category: "郁金香", price: 18, form: "tulip", color: "#efc04b", soft: "#ffe082", deep: "#c78922", core: "#8a5a18", tags: ["祝福", "活力"] },
+      { id: "white-lily", name: "白百合", category: "百合", price: 20, form: "lily", color: "#faf8ed", soft: "#ffffff", deep: "#e4dac3", core: "#c99736", tags: ["高雅", "慰问"] },
+      { id: "pink-lily", name: "粉百合", category: "百合", price: 22, form: "lily", color: "#f0a5b4", soft: "#ffd1d8", deep: "#bd6a7e", core: "#a86a2f", tags: ["甜美", "生日"] },
+      { id: "sunflower", name: "向日葵", category: "主花", price: 12, form: "sun", color: "#f2bd2e", soft: "#ffdb62", deep: "#d98b23", core: "#5b3b1f", tags: ["阳光", "鼓励"] },
+      { id: "carnation", name: "康乃馨", category: "主花", price: 12, form: "rose", color: "#d95b77", soft: "#ff9caf", deep: "#a93b5b", core: "#7a2a43", tags: ["感恩", "亲情"] },
+      { id: "daisy", name: "小雏菊", category: "配花", price: 8, form: "lily", color: "#fffdf3", soft: "#ffffff", deep: "#ece1c0", core: "#e7b72f", tags: ["清新", "陪伴"] },
+      { id: "eucalyptus", name: "尤加利叶", category: "配叶", price: 5, form: "greenery", color: "#6f9c72", soft: "#95b98c", deep: "#537f5a", core: "#2f7356", tags: ["自然", "森系"] }
     ];
 
     const packages = [
@@ -1015,9 +1213,85 @@
       { id: "gift", name: "礼盒感紫灰包装", price: 20, className: "package-gift", swatch: "linear-gradient(135deg,#a9a0c7,#fbf5ff)", ribbon: "#c99736" }
     ];
 
+    const templates = [
+      {
+        id: "confession",
+        name: "告白红玫瑰",
+        note: "红玫瑰为主，适合表白和纪念日",
+        packageId: "blush",
+        message: "想把今天的浪漫，都交给你",
+        items: [
+          ["eucalyptus", 178, 110, -26, 1.06, 10],
+          ["eucalyptus", 306, 112, 24, 1.04, 11],
+          ["white-rose", 210, 126, -14, 0.98, 18],
+          ["red-rose", 238, 112, -4, 1.14, 24],
+          ["red-rose", 272, 134, 12, 1.08, 25],
+          ["pink-rose", 198, 156, -20, 0.96, 22],
+          ["pink-tulip", 314, 158, 18, 0.94, 20],
+          ["daisy", 160, 186, -30, 0.82, 16],
+          ["daisy", 350, 184, 28, 0.82, 17]
+        ]
+      },
+      {
+        id: "forest",
+        name: "森系自然风",
+        note: "叶材拉开轮廓，适合清新日常礼",
+        packageId: "forest",
+        message: "愿你被温柔和绿意包围",
+        items: [
+          ["eucalyptus", 166, 96, -32, 1.14, 10],
+          ["eucalyptus", 314, 98, 32, 1.12, 11],
+          ["eucalyptus", 238, 86, 2, 1.02, 12],
+          ["white-lily", 206, 130, -12, 1.02, 20],
+          ["daisy", 260, 126, 10, 0.92, 21],
+          ["white-rose", 236, 152, -4, 1.04, 24],
+          ["yellow-tulip", 302, 158, 20, 0.92, 22],
+          ["daisy", 178, 184, -24, 0.86, 18]
+        ]
+      },
+      {
+        id: "birthday",
+        name: "生日向日葵",
+        note: "明亮主花，适合生日和鼓励",
+        packageId: "paper",
+        message: "生日快乐，愿你一路向阳",
+        items: [
+          ["eucalyptus", 188, 118, -22, 1.02, 10],
+          ["eucalyptus", 306, 120, 24, 1.02, 11],
+          ["sunflower", 220, 106, -10, 1.12, 24],
+          ["sunflower", 274, 116, 12, 1.08, 25],
+          ["yellow-tulip", 190, 158, -18, 0.96, 21],
+          ["pink-lily", 312, 154, 18, 0.94, 20],
+          ["carnation", 238, 160, 0, 0.98, 23],
+          ["daisy", 158, 188, -30, 0.82, 16],
+          ["daisy", 350, 188, 30, 0.82, 17]
+        ]
+      },
+      {
+        id: "gentle",
+        name: "温柔粉白",
+        note: "粉白低饱和，适合感谢和探望",
+        packageId: "gift",
+        message: "把轻轻的祝福送给你",
+        items: [
+          ["eucalyptus", 184, 112, -24, 1.02, 10],
+          ["eucalyptus", 306, 112, 24, 1.02, 11],
+          ["white-lily", 216, 116, -10, 1.04, 22],
+          ["pink-lily", 274, 126, 10, 0.98, 23],
+          ["white-rose", 236, 148, -4, 1.04, 24],
+          ["pink-rose", 198, 158, -18, 0.94, 21],
+          ["pink-tulip", 316, 160, 18, 0.92, 20],
+          ["daisy", 160, 186, -30, 0.82, 16],
+          ["daisy", 348, 186, 30, 0.82, 17]
+        ]
+      }
+    ];
+
     const state = {
       category: "全部",
       packageId: "paper",
+      activeTemplate: "forest",
+      message: "愿今日有花，也有好心情",
       items: [],
       selectedId: null,
       drag: null,
@@ -1026,11 +1300,17 @@
     };
 
     const board = document.getElementById("board");
+    const templateList = document.getElementById("templateList");
     const flowerList = document.getElementById("flowerList");
     const filters = document.getElementById("filters");
     const flowerLayer = document.getElementById("flowerLayer");
     const packageList = document.getElementById("packageList");
     const recipeList = document.getElementById("recipeList");
+    const moodTags = document.getElementById("moodTags");
+    const moodCopy = document.getElementById("moodCopy");
+    const sceneText = document.getElementById("sceneText");
+    const messageCard = document.getElementById("messageCard");
+    const messageInput = document.getElementById("messageInput");
     const selectedName = document.getElementById("selectedName");
     const rotateRange = document.getElementById("rotateRange");
     const scaleRange = document.getElementById("scaleRange");
@@ -1039,6 +1319,15 @@
 
     function money(value) {
       return "¥" + value.toFixed(2);
+    }
+
+    function renderTemplates() {
+      templateList.innerHTML = templates.map(template => `
+        <button type="button" class="template-card ${state.activeTemplate === template.id ? "active" : ""}" data-template-id="${template.id}">
+          <strong>${template.name}</strong>
+          <span>${template.note}</span>
+        </button>
+      `).join("");
     }
 
     function renderFilters() {
@@ -1052,6 +1341,10 @@
       return `--flower-color:${flower.color};--flower-soft:${flower.soft};--flower-deep:${flower.deep};--flower-core:${flower.core};`;
     }
 
+    function flowerTagHtml(flower) {
+      return `<div class="flower-tags">${flower.tags.map(tag => `<em>${tag}</em>`).join("")}</div>`;
+    }
+
     function renderFlowerList() {
       const visible = state.category === "全部" ? flowers : flowers.filter(f => f.category === state.category);
       flowerList.innerHTML = visible.map(flower => `
@@ -1060,6 +1353,7 @@
           <div class="flower-meta">
             <strong>${flower.name}</strong>
             <span>${flower.category} / ${money(flower.price)} 每支</span>
+            ${flowerTagHtml(flower)}
           </div>
           <button class="add-small" type="button" data-add-id="${flower.id}" aria-label="加入${flower.name}">+</button>
         </div>
@@ -1145,6 +1439,38 @@
       document.getElementById("totalText").textContent = money(flowerTotal + pkg.price);
     }
 
+    function renderMood() {
+      const counts = new Map();
+      state.items.forEach(item => {
+        const flower = flowers.find(f => f.id === item.flowerId);
+        flower.tags.forEach(tag => counts.set(tag, (counts.get(tag) || 0) + 1));
+      });
+
+      const tags = Array.from(counts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4)
+        .map(entry => entry[0]);
+
+      if (!tags.length) {
+        sceneText.textContent = "自动识别";
+        moodTags.innerHTML = `<span>待选择</span>`;
+        moodCopy.textContent = "加入花材后，会根据花材组合显示适合的赠花场景。";
+        return;
+      }
+
+      sceneText.textContent = tags.slice(0, 2).join(" / ");
+      moodTags.innerHTML = tags.map(tag => `<span>${tag}</span>`).join("");
+      moodCopy.textContent = `这束花偏向「${tags.join("、")}」氛围，适合在保存方案前作为推荐文案参考。`;
+    }
+
+    function renderMessageCard() {
+      const text = state.message.trim() || "愿今日有花，也有好心情";
+      messageCard.textContent = text;
+      if (messageInput.value !== state.message) {
+        messageInput.value = state.message;
+      }
+    }
+
     function renderInspector() {
       const item = selectedItem();
       if (!item) {
@@ -1164,11 +1490,14 @@
     }
 
     function renderAll() {
+      renderTemplates();
       renderFilters();
       renderFlowerList();
       renderPackages();
       renderBoard();
       renderRecipe();
+      renderMood();
+      renderMessageCard();
       renderInspector();
     }
 
@@ -1180,7 +1509,10 @@
       };
     }
 
-    function addFlower(flowerId, position) {
+    function addFlower(flowerId, position, keepTemplate = false) {
+      if (!keepTemplate) {
+        state.activeTemplate = null;
+      }
       const item = {
         uid: "f" + state.nextId++,
         flowerId,
@@ -1199,12 +1531,14 @@
     function updateSelected(patch) {
       const item = selectedItem();
       if (!item) return;
+      state.activeTemplate = null;
       Object.assign(item, patch);
       renderAll();
     }
 
     function removeSelected() {
       if (!state.selectedId) return;
+      state.activeTemplate = null;
       state.items = state.items.filter(item => item.uid !== state.selectedId);
       state.selectedId = null;
       renderAll();
@@ -1225,6 +1559,7 @@
     function shiftLayer(direction) {
       const item = selectedItem();
       if (!item) return;
+      state.activeTemplate = null;
       item.z += direction;
       renderAll();
     }
@@ -1250,6 +1585,7 @@
         const item = state.items.find(entry => entry.uid === state.rotate.uid);
         if (!item) return;
         const angle = pointerAngle(event, state.rotate.origin);
+        state.activeTemplate = null;
         item.rotation = Math.round(clamp(state.rotate.baseRotation + angle - state.rotate.startAngle, -60, 60));
         renderBoard();
         renderInspector();
@@ -1260,6 +1596,7 @@
       const item = state.items.find(entry => entry.uid === state.drag.uid);
       if (!item) return;
       const rect = board.getBoundingClientRect();
+      state.activeTemplate = null;
       item.x = Math.max(24, Math.min(event.clientX - rect.left - state.drag.dx, rect.width - 110));
       item.y = Math.max(18, Math.min(event.clientY - rect.top - state.drag.dy, rect.height - 220));
       item.z = Math.round(item.y);
@@ -1272,36 +1609,32 @@
       state.rotate = null;
     }
 
-    function centerArrange() {
+    function floristArrange() {
       const count = state.items.length;
       if (!count) return;
+      state.activeTemplate = null;
       state.items.forEach((item, index) => {
         const offset = index - (count - 1) / 2;
-        item.x = 238 + offset * 22;
-        item.y = 118 + Math.abs(offset) * 9 + (index % 3) * 8;
-        item.rotation = Math.round(offset * 8);
+        const fan = count > 1 ? offset / ((count - 1) / 2) : 0;
+        item.x = 238 + offset * 21;
+        item.y = 110 + Math.abs(offset) * 12 + (index % 3) * 7;
+        item.rotation = Math.round(fan * 24);
+        item.scale = Math.max(0.84, Math.min(item.scale, 1.12));
         item.z = 30 + index;
       });
       renderAll();
     }
 
-    function loadPreset() {
+    function loadTemplate(templateId) {
+      const template = templates.find(entry => entry.id === templateId) || templates[0];
       state.items = [];
       state.selectedId = null;
       state.nextId = 1;
-      state.packageId = "forest";
-      [
-        ["eucalyptus", 186, 112, -24, 1.08, 10],
-        ["eucalyptus", 296, 108, 24, 1.04, 11],
-        ["white-lily", 216, 118, -10, 1.04, 18],
-        ["sunflower", 264, 104, 8, 1.08, 20],
-        ["red-rose", 238, 138, -2, 1.12, 24],
-        ["pink-rose", 194, 156, -18, 0.96, 22],
-        ["pink-tulip", 306, 154, 18, 0.98, 23],
-        ["daisy", 154, 182, -28, 0.88, 16],
-        ["daisy", 342, 182, 30, 0.88, 17]
-      ].forEach(row => addFlower(row[0], { x: row[1], y: row[2], rotation: row[3], scale: row[4], z: row[5] }));
-      state.selectedId = state.items[4]?.uid || null;
+      state.packageId = template.packageId;
+      state.activeTemplate = template.id;
+      state.message = template.message;
+      template.items.forEach(row => addFlower(row[0], { x: row[1], y: row[2], rotation: row[3], scale: row[4], z: row[5] }, true));
+      state.selectedId = state.items[Math.floor(state.items.length / 2)]?.uid || null;
       renderAll();
     }
 
@@ -1310,6 +1643,12 @@
       if (!button) return;
       state.category = button.dataset.cat;
       renderAll();
+    });
+
+    templateList.addEventListener("click", event => {
+      const button = event.target.closest("[data-template-id]");
+      if (!button) return;
+      loadTemplate(button.dataset.templateId);
     });
 
     flowerList.addEventListener("click", event => {
@@ -1340,6 +1679,7 @@
       const button = event.target.closest("[data-package-id]");
       if (!button) return;
       state.packageId = button.dataset.packageId;
+      state.activeTemplate = null;
       renderAll();
     });
 
@@ -1391,20 +1731,31 @@
       updateSelected({ scale: Number(event.target.value) / 100 });
     });
 
+    messageInput.addEventListener("input", event => {
+      state.message = event.target.value;
+      state.activeTemplate = null;
+      renderMessageCard();
+      renderTemplates();
+    });
+
     document.getElementById("deleteBtn").addEventListener("click", removeSelected);
     document.getElementById("duplicateBtn").addEventListener("click", duplicateSelected);
     document.getElementById("bringForwardBtn").addEventListener("click", () => shiftLayer(8));
     document.getElementById("sendBackwardBtn").addEventListener("click", () => shiftLayer(-8));
-    document.getElementById("centerBtn").addEventListener("click", centerArrange);
-    document.getElementById("presetBtn").addEventListener("click", loadPreset);
+    document.getElementById("centerBtn").addEventListener("click", floristArrange);
+    document.getElementById("presetBtn").addEventListener("click", () => {
+      const index = templates.findIndex(template => template.id === state.activeTemplate);
+      loadTemplate(templates[(index + 1) % templates.length].id);
+    });
     document.getElementById("clearBtn").addEventListener("click", () => {
       state.items = [];
       state.selectedId = null;
+      state.activeTemplate = null;
       renderAll();
     });
 
     renderAll();
-    loadPreset();
+    loadTemplate("forest");
   </script>
 </body>
 </html>
