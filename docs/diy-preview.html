@@ -338,6 +338,36 @@
         0 9px 0 -5px var(--flower-soft);
     }
 
+    .mini-flower.tulip::after {
+      height: 31px;
+      border-radius: 50% 50% 44% 44%;
+      clip-path: polygon(10% 36%, 25% 0, 50% 28%, 76% 0, 92% 36%, 78% 100%, 22% 100%);
+      box-shadow: inset -5px -6px 10px rgba(0,0,0,0.1);
+    }
+
+    .mini-flower.lily::after {
+      background:
+        radial-gradient(circle at 50% 50%, var(--flower-core) 0 12%, transparent 13%),
+        conic-gradient(from 20deg, var(--flower-color) 0 15%, transparent 15% 22%, var(--flower-soft) 22% 36%, transparent 36% 43%, var(--flower-color) 43% 57%, transparent 57% 64%, var(--flower-soft) 64% 79%, transparent 79%);
+      box-shadow: none;
+    }
+
+    .mini-flower.sun::after {
+      background:
+        radial-gradient(circle at 50% 50%, #5b3b1f 0 24%, transparent 25%),
+        repeating-conic-gradient(#f2bd2e 0 12deg, #e28c27 12deg 22deg);
+      box-shadow: none;
+    }
+
+    .mini-flower.greenery::after {
+      height: 36px;
+      background:
+        radial-gradient(ellipse at 30% 26%, #95b98c 0 17%, transparent 18%),
+        radial-gradient(ellipse at 70% 38%, #6f9c72 0 18%, transparent 19%),
+        radial-gradient(ellipse at 38% 66%, #89ad7f 0 17%, transparent 18%);
+      box-shadow: none;
+    }
+
     .flower-meta strong {
       display: block;
       font-size: 14px;
@@ -473,6 +503,27 @@
       opacity: 0;
     }
 
+    .snap-halo {
+      position: absolute;
+      left: 226px;
+      top: 374px;
+      width: 108px;
+      height: 58px;
+      border-radius: 50%;
+      border: 1px dashed rgba(47, 115, 86, 0.3);
+      background: radial-gradient(ellipse at center, rgba(47, 115, 86, 0.12), transparent 68%);
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.18s, transform 0.18s;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .bouquet-board.snap-active .snap-halo {
+      opacity: 1;
+      transform: scale(1);
+    }
+
     .wrap-layer {
       position: absolute;
       pointer-events: none;
@@ -483,8 +534,9 @@
       position: absolute;
       inset: 0;
       background:
-        repeating-linear-gradient(112deg, rgba(255,255,255,0.16) 0 2px, transparent 2px 16px),
-        linear-gradient(90deg, rgba(255,255,255,0.12), rgba(0,0,0,0.05));
+        linear-gradient(115deg, transparent 0 24%, rgba(255,255,255,0.28) 25% 27%, transparent 28% 52%, rgba(0,0,0,0.08) 53% 54%, transparent 55%),
+        repeating-linear-gradient(112deg, rgba(255,255,255,0.14) 0 2px, transparent 2px 16px),
+        linear-gradient(90deg, rgba(255,255,255,0.12), rgba(0,0,0,0.07));
       mix-blend-mode: soft-light;
       pointer-events: none;
     }
@@ -533,8 +585,22 @@
       height: 238px;
       background: var(--package-front);
       clip-path: polygon(6% 0, 94% 0, 76% 100%, 24% 100%);
-      box-shadow: 0 -12px 20px rgba(255,255,255,0.22) inset;
+      box-shadow:
+        0 -12px 20px rgba(255,255,255,0.22) inset,
+        0 -18px 30px rgba(68, 48, 31, 0.15);
       z-index: 6;
+    }
+
+    .wrap-front::before {
+      content: "";
+      position: absolute;
+      left: 44px;
+      right: 44px;
+      top: 5px;
+      height: 50px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(62, 43, 28, 0.22), transparent 72%);
+      filter: blur(3px);
     }
 
     .wrap-ribbon {
@@ -654,6 +720,7 @@
       cursor: move;
       user-select: none;
       filter: drop-shadow(0 8px 8px rgba(42, 35, 28, 0.16));
+      transition: filter 0.16s;
     }
 
     .placed-flower.selected {
@@ -673,6 +740,9 @@
       background: linear-gradient(90deg, #285b3f, #62a06e 58%, #2d6b4a);
       transform: rotate(var(--stem-bend));
       transform-origin: top center;
+      box-shadow:
+        6px 16px 0 -2px rgba(42, 93, 54, 0.35),
+        -4px 46px 0 -2px rgba(40, 87, 59, 0.28);
     }
 
     .placed-flower .leaf {
@@ -687,13 +757,13 @@
 
     .placed-flower .leaf.left {
       left: 13px;
-      transform: rotate(28deg);
+      transform: rotate(calc(24deg + var(--stem-bend)));
     }
 
     .placed-flower .leaf.right {
       right: 10px;
       top: 118px;
-      transform: rotate(204deg);
+      transform: rotate(calc(204deg + var(--stem-bend)));
     }
 
     .bloom {
@@ -703,6 +773,7 @@
       width: 62px;
       height: 62px;
       border-radius: 50%;
+      transform: rotate(var(--bloom-tilt));
     }
 
     .bloom::after {
@@ -717,8 +788,9 @@
 
     .bloom.rose {
       background:
-        radial-gradient(circle at 50% 50%, var(--core) 0 10%, transparent 11%),
-        conic-gradient(from 0deg, var(--soft), var(--color), var(--deep), var(--soft), var(--color));
+        radial-gradient(circle at 50% 50%, var(--core) 0 9%, transparent 10%),
+        repeating-radial-gradient(ellipse at 50% 50%, transparent 0 7px, rgba(255,255,255,0.2) 8px 10px, transparent 11px 15px),
+        conic-gradient(from 18deg, var(--soft) 0 12%, var(--color) 12% 24%, var(--deep) 24% 37%, var(--soft) 37% 51%, var(--color) 51% 67%, var(--deep) 67% 82%, var(--soft) 82% 100%);
       box-shadow:
         -18px 2px 0 -9px var(--soft),
         15px 4px 0 -10px var(--deep),
@@ -732,22 +804,28 @@
       left: 16px;
       border-radius: 50% 50% 46% 46%;
       clip-path: polygon(8% 35%, 24% 0, 50% 28%, 78% 0, 94% 35%, 78% 100%, 22% 100%);
-      background: linear-gradient(145deg, var(--soft), var(--color) 48%, var(--deep));
-      box-shadow: inset -8px -8px 18px rgba(0,0,0,0.12);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.2) 0 18%, transparent 19% 45%, rgba(0,0,0,0.1) 46% 52%, transparent 53%),
+        linear-gradient(145deg, var(--soft), var(--color) 48%, var(--deep));
+      box-shadow:
+        inset -8px -8px 18px rgba(0,0,0,0.12),
+        inset 7px 4px 14px rgba(255,255,255,0.25);
     }
 
     .bloom.lily {
       background:
-        radial-gradient(circle at 50% 50%, var(--core) 0 11%, transparent 12%),
-        conic-gradient(from 20deg, var(--color) 0 15%, transparent 15% 20%, var(--soft) 20% 35%, transparent 35% 40%, var(--color) 40% 55%, transparent 55% 60%, var(--soft) 60% 75%, transparent 75% 80%, var(--color) 80%);
+        radial-gradient(circle at 50% 50%, var(--core) 0 10%, transparent 11%),
+        radial-gradient(ellipse at 50% 35%, rgba(153, 97, 42, 0.34) 0 2px, transparent 3px),
+        conic-gradient(from 20deg, var(--color) 0 14%, transparent 14% 20%, var(--soft) 20% 34%, transparent 34% 40%, var(--color) 40% 54%, transparent 54% 60%, var(--soft) 60% 74%, transparent 74% 80%, var(--color) 80% 94%, transparent 94%);
       filter: drop-shadow(0 2px 2px rgba(0,0,0,0.12));
     }
 
     .bloom.sun {
       background:
-        radial-gradient(circle at 50% 50%, #5b3b1f 0 24%, transparent 25%),
-        repeating-conic-gradient(#f2bd2e 0 12deg, #e28c27 12deg 22deg);
+        radial-gradient(circle at 50% 50%, #5b3b1f 0 22%, rgba(91, 59, 31, 0.7) 23% 27%, transparent 28%),
+        repeating-conic-gradient(#f6c943 0 8deg, #e28c27 8deg 16deg, #f2bd2e 16deg 22deg);
       border-radius: 50%;
+      box-shadow: 0 0 0 5px rgba(242, 189, 46, 0.2);
     }
 
     .bloom.greenery {
@@ -756,10 +834,11 @@
       left: 16px;
       top: 0;
       background:
-        radial-gradient(ellipse at 28% 30%, #95b98c 0 18%, transparent 19%),
-        radial-gradient(ellipse at 70% 38%, #6f9c72 0 20%, transparent 21%),
-        radial-gradient(ellipse at 32% 62%, #89ad7f 0 19%, transparent 20%),
-        radial-gradient(ellipse at 70% 70%, #537f5a 0 16%, transparent 17%);
+        radial-gradient(ellipse at 28% 30%, #95b98c 0 17%, transparent 18%),
+        radial-gradient(ellipse at 70% 38%, #6f9c72 0 19%, transparent 20%),
+        radial-gradient(ellipse at 32% 62%, #89ad7f 0 18%, transparent 19%),
+        radial-gradient(ellipse at 70% 70%, #537f5a 0 15%, transparent 16%),
+        linear-gradient(92deg, transparent 0 47%, rgba(47, 115, 86, 0.45) 48% 51%, transparent 52%);
       border-radius: 24px;
     }
 
@@ -1103,6 +1182,7 @@
           <div class="bouquet-board package-paper" id="board">
             <div class="board-grid"></div>
             <div class="drop-hint">从左侧拖入花材，或点击花材旁的加号</div>
+            <div class="snap-halo" aria-hidden="true"></div>
             <div id="flowerLayer"></div>
             <div class="wrap-layer wrap-back"></div>
             <div class="wrap-layer wrap-left"></div>
@@ -1296,6 +1376,7 @@
       selectedId: null,
       drag: null,
       rotate: null,
+      snapActive: false,
       nextId: 1
     };
 
@@ -1349,7 +1430,7 @@
       const visible = state.category === "全部" ? flowers : flowers.filter(f => f.category === state.category);
       flowerList.innerHTML = visible.map(flower => `
         <div class="flower-option" draggable="true" data-flower-id="${flower.id}" style="${flowerStyleVars(flower)}">
-          <div class="mini-flower" aria-hidden="true"></div>
+          <div class="mini-flower ${flower.form}" aria-hidden="true"></div>
           <div class="flower-meta">
             <strong>${flower.name}</strong>
             <span>${flower.category} / ${money(flower.price)} 每支</span>
@@ -1387,6 +1468,7 @@
       node.style.setProperty("--deep", flower.deep);
       node.style.setProperty("--core", flower.core);
       node.style.setProperty("--stem-bend", item.bend + "deg");
+      node.style.setProperty("--bloom-tilt", item.tilt + "deg");
       node.style.transform = `rotate(${item.rotation}deg) scale(${item.scale})`;
       node.innerHTML = `
         <div class="stem"></div>
@@ -1407,7 +1489,7 @@
         .forEach(item => flowerLayer.appendChild(createFlowerNode(item)));
 
       const pkg = packages.find(p => p.id === state.packageId);
-      board.className = "bouquet-board " + pkg.className + (state.items.length ? " has-items" : "");
+      board.className = "bouquet-board " + pkg.className + (state.items.length ? " has-items" : "") + (state.snapActive ? " snap-active" : "");
     }
 
     function renderRecipe() {
@@ -1503,9 +1585,25 @@
 
     function boardPoint(clientX, clientY) {
       const rect = board.getBoundingClientRect();
-      return {
+      const point = {
         x: Math.max(24, Math.min(clientX - rect.left - 43, rect.width - 110)),
         y: Math.max(18, Math.min(clientY - rect.top - 94, rect.height - 220))
+      };
+      return snapToBouquetMouth(point, rect.width, rect.height);
+    }
+
+    function snapToBouquetMouth(point, width = 560, height = 600) {
+      const mouth = { x: width / 2 - 43, y: height * 0.58 };
+      const dx = point.x - mouth.x;
+      const dy = point.y - mouth.y;
+      const distance = Math.hypot(dx, dy);
+      if (distance > 90) {
+        return { ...point, snapped: false };
+      }
+      return {
+        x: Math.round(point.x - dx * 0.38),
+        y: Math.round(point.y - dy * 0.46),
+        snapped: true
       };
     }
 
@@ -1521,7 +1619,8 @@
         rotation: position?.rotation ?? [-18, 12, -8, 18, 4][state.items.length % 5],
         scale: position?.scale ?? 1,
         z: position?.z ?? 20 + state.items.length,
-        bend: [-4, 3, 7, -8, 2][state.items.length % 5]
+        bend: [-4, 3, 7, -8, 2][state.items.length % 5],
+        tilt: [-6, 4, -3, 7, 2][state.items.length % 5]
       };
       state.items.push(item);
       state.selectedId = item.uid;
@@ -1597,9 +1696,14 @@
       if (!item) return;
       const rect = board.getBoundingClientRect();
       state.activeTemplate = null;
-      item.x = Math.max(24, Math.min(event.clientX - rect.left - state.drag.dx, rect.width - 110));
-      item.y = Math.max(18, Math.min(event.clientY - rect.top - state.drag.dy, rect.height - 220));
+      const point = snapToBouquetMouth({
+        x: Math.max(24, Math.min(event.clientX - rect.left - state.drag.dx, rect.width - 110)),
+        y: Math.max(18, Math.min(event.clientY - rect.top - state.drag.dy, rect.height - 220))
+      }, rect.width, rect.height);
+      item.x = point.x;
+      item.y = point.y;
       item.z = Math.round(item.y);
+      state.snapActive = point.snapped;
       renderBoard();
       renderInspector();
     }
@@ -1607,6 +1711,8 @@
     function endActivePointer() {
       state.drag = null;
       state.rotate = null;
+      state.snapActive = false;
+      renderBoard();
     }
 
     function floristArrange() {
