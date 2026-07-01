@@ -28,9 +28,8 @@
       font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
       color: var(--ink);
       background:
-        linear-gradient(120deg, rgba(246, 244, 239, 0.94), rgba(237, 244, 238, 0.96)),
-        radial-gradient(circle at 18% 20%, rgba(180, 70, 70, 0.1), transparent 28%),
-        radial-gradient(circle at 80% 10%, rgba(47, 115, 86, 0.12), transparent 26%);
+        linear-gradient(135deg, rgba(246, 244, 239, 0.96), rgba(240, 245, 238, 0.98)),
+        repeating-linear-gradient(90deg, rgba(90, 75, 54, 0.025) 0 1px, transparent 1px 18px);
     }
 
     button,
@@ -166,6 +165,9 @@
     .flower-panel {
       display: grid;
       grid-template-rows: auto auto 1fr;
+      background:
+        linear-gradient(180deg, rgba(255, 254, 250, 0.96), rgba(249, 244, 235, 0.94)),
+        repeating-linear-gradient(0deg, transparent 0 72px, rgba(99, 76, 48, 0.08) 72px 73px);
     }
 
     .filter-row {
@@ -194,6 +196,7 @@
     }
 
     .flower-option {
+      position: relative;
       display: grid;
       grid-template-columns: 50px 1fr 34px;
       gap: 10px;
@@ -201,10 +204,25 @@
       min-height: 68px;
       padding: 10px;
       margin-bottom: 9px;
-      border: 1px solid transparent;
+      border: 1px solid rgba(120, 97, 67, 0.1);
       border-radius: 8px;
-      background: #f7f3eb;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.72), rgba(247,243,235,0.92)),
+        #f7f3eb;
       cursor: grab;
+      box-shadow: 0 6px 16px rgba(68, 51, 32, 0.05);
+      overflow: hidden;
+    }
+
+    .flower-option::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 10px;
+      background: linear-gradient(180deg, rgba(156, 132, 92, 0), rgba(156, 132, 92, 0.14));
+      pointer-events: none;
     }
 
     .flower-option:hover {
@@ -217,7 +235,9 @@
       width: 46px;
       height: 52px;
       border-radius: 6px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(234,228,218,0.78));
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.8), rgba(234,228,218,0.78)),
+        linear-gradient(90deg, transparent 0 43%, rgba(70, 104, 62, 0.16) 44% 49%, transparent 50%);
       overflow: hidden;
     }
 
@@ -304,10 +324,14 @@
     }
 
     .canvas-wrap {
+      position: relative;
       min-height: 560px;
       display: grid;
       place-items: center;
       padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0) 0 62%, rgba(163, 126, 76, 0.12) 62% 100%),
+        repeating-linear-gradient(90deg, rgba(115, 91, 60, 0.035) 0 1px, transparent 1px 24px);
     }
 
     .bouquet-board {
@@ -316,22 +340,36 @@
       height: 600px;
       border-radius: 8px;
       background:
-        linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0)),
-        radial-gradient(ellipse at 50% 22%, rgba(80, 112, 75, 0.09), transparent 42%),
+        linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.08)),
+        radial-gradient(ellipse at 50% 72%, rgba(112, 83, 47, 0.1), transparent 46%),
         #fbfaf5;
       border: 1px solid rgba(70, 62, 49, 0.12);
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
+    .bouquet-board::before {
+      content: "";
+      position: absolute;
+      left: 78px;
+      right: 78px;
+      bottom: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(85, 60, 34, 0.12);
+      filter: blur(12px);
+      z-index: 0;
+    }
+
     .board-grid {
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(72, 65, 54, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(72, 65, 54, 0.045) 1px, transparent 1px);
+        linear-gradient(rgba(72, 65, 54, 0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(72, 65, 54, 0.028) 1px, transparent 1px);
       background-size: 28px 28px;
       mask-image: radial-gradient(ellipse at center, black, transparent 76%);
+      z-index: 0;
     }
 
     .drop-hint {
@@ -354,6 +392,17 @@
       pointer-events: none;
     }
 
+    .wrap-layer::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(112deg, rgba(255,255,255,0.16) 0 2px, transparent 2px 16px),
+        linear-gradient(90deg, rgba(255,255,255,0.12), rgba(0,0,0,0.05));
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+    }
+
     .wrap-back {
       left: 94px;
       top: 210px;
@@ -364,6 +413,7 @@
       clip-path: polygon(6% 0, 94% 0, 82% 100%, 18% 100%);
       box-shadow: inset 0 0 0 1px rgba(75, 66, 54, 0.11);
       opacity: 0.94;
+      z-index: 1;
     }
 
     .wrap-left {
@@ -375,6 +425,7 @@
       clip-path: polygon(0 0, 100% 23%, 78% 100%, 16% 88%);
       transform: rotate(-8deg);
       box-shadow: -12px 20px 30px rgba(72, 55, 40, 0.14);
+      z-index: 5;
     }
 
     .wrap-right {
@@ -386,6 +437,7 @@
       clip-path: polygon(0 23%, 100% 0, 84% 88%, 22% 100%);
       transform: rotate(8deg);
       box-shadow: 12px 20px 30px rgba(72, 55, 40, 0.14);
+      z-index: 5;
     }
 
     .wrap-front {
@@ -396,6 +448,7 @@
       background: var(--package-front);
       clip-path: polygon(6% 0, 94% 0, 76% 100%, 24% 100%);
       box-shadow: 0 -12px 20px rgba(255,255,255,0.22) inset;
+      z-index: 6;
     }
 
     .wrap-ribbon {
@@ -408,6 +461,13 @@
         linear-gradient(90deg, transparent 0 16%, rgba(255,255,255,0.36) 17% 23%, transparent 24%),
         var(--ribbon);
       box-shadow: 0 8px 18px rgba(74, 40, 38, 0.2);
+      z-index: 7;
+    }
+
+    #flowerLayer {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
     }
 
     .wrap-ribbon::before,
@@ -479,6 +539,7 @@
       outline: 1px dashed rgba(180, 70, 70, 0.72);
       outline-offset: 6px;
       z-index: 999 !important;
+      filter: drop-shadow(0 10px 10px rgba(42, 35, 28, 0.2));
     }
 
     .placed-flower .stem {
@@ -521,6 +582,16 @@
       width: 62px;
       height: 62px;
       border-radius: 50%;
+    }
+
+    .bloom::after {
+      content: "";
+      position: absolute;
+      inset: 9px 12px 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.16);
+      transform: rotate(-18deg);
+      pointer-events: none;
     }
 
     .bloom.rose {
@@ -585,6 +656,11 @@
       justify-content: center;
       font-size: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+      cursor: grab;
+    }
+
+    .handle-dot:active {
+      cursor: grabbing;
     }
 
     .placed-flower.selected .handle-dot {
@@ -613,6 +689,7 @@
       border-radius: 8px;
       background: #f8f4ec;
       text-align: left;
+      cursor: pointer;
     }
 
     .package-option.active {
@@ -624,7 +701,9 @@
     .package-swatch {
       height: 52px;
       border-radius: 8px;
-      background: var(--swatch);
+      background:
+        repeating-linear-gradient(125deg, rgba(255,255,255,0.2) 0 2px, transparent 2px 12px),
+        var(--swatch);
       position: relative;
       overflow: hidden;
     }
@@ -816,7 +895,7 @@
         <div class="brand-mark" aria-hidden="true"></div>
         <div>
           <h1>DIY花束定制工作台</h1>
-          <p>预览稿：挑选花材、选择包装、自由摆放并保存设计构图</p>
+          <p>预览稿：花材陈列、包装纸样和花束台面效果</p>
         </div>
       </div>
       <div class="top-actions">
@@ -830,7 +909,7 @@
       <aside class="panel flower-panel">
         <div class="panel-header">
           <h2>花材架</h2>
-          <p>点击加号或拖拽到中间工作台。每一支花都可以单独移动、旋转和缩放。</p>
+          <p>按花材类型浏览主花、配花和配叶，组合出更接近真实门店的花束层次。</p>
         </div>
         <div class="filter-row" id="filters"></div>
         <div class="flower-list" id="flowerList"></div>
@@ -840,7 +919,7 @@
         <div class="stage-toolbar">
           <div>
             <h2>花束工作台</h2>
-            <span>花材会从束口处向上展开，包装层在底部承托视觉重心</span>
+            <span>花材从束口向上展开，包装纸在前景形成承托和遮挡</span>
           </div>
           <button class="quiet-btn" id="centerBtn" type="button">居中整理</button>
         </div>
@@ -861,7 +940,7 @@
       <aside class="panel inspector-panel">
         <div class="panel-header">
           <h2>包装与调整</h2>
-          <p>包装会改变纸张质感、色彩和缎带，花束总价实时更新。</p>
+          <p>切换纸样、缎带和花材姿态，预估价格会同步变化。</p>
         </div>
         <div class="package-list" id="packageList"></div>
 
@@ -888,7 +967,7 @@
 
         <div class="panel-header">
           <h2>花束清单</h2>
-          <p>这里用于模拟保存前的方案明细。</p>
+          <p>保存前核对花材数量、包装和预计总价。</p>
         </div>
         <div class="recipe-list" id="recipeList"></div>
 
@@ -942,6 +1021,7 @@
       items: [],
       selectedId: null,
       drag: null,
+      rotate: null,
       nextId: 1
     };
 
@@ -1019,7 +1099,7 @@
         <div class="leaf left"></div>
         <div class="leaf right"></div>
         <div class="bloom ${flower.form}"></div>
-        <div class="handle-dot" aria-hidden="true">↻</div>
+        <div class="handle-dot" title="拖拽旋转" aria-hidden="true">↻</div>
       `;
       return node;
     }
@@ -1149,6 +1229,49 @@
       renderAll();
     }
 
+    function flowerOrigin(item) {
+      const rect = board.getBoundingClientRect();
+      return {
+        x: rect.left + item.x + 43,
+        y: rect.top + item.y + 175
+      };
+    }
+
+    function pointerAngle(event, origin) {
+      return Math.atan2(event.clientY - origin.y, event.clientX - origin.x) * 180 / Math.PI;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(value, max));
+    }
+
+    function moveActivePointer(event) {
+      if (state.rotate) {
+        const item = state.items.find(entry => entry.uid === state.rotate.uid);
+        if (!item) return;
+        const angle = pointerAngle(event, state.rotate.origin);
+        item.rotation = Math.round(clamp(state.rotate.baseRotation + angle - state.rotate.startAngle, -60, 60));
+        renderBoard();
+        renderInspector();
+        return;
+      }
+
+      if (!state.drag) return;
+      const item = state.items.find(entry => entry.uid === state.drag.uid);
+      if (!item) return;
+      const rect = board.getBoundingClientRect();
+      item.x = Math.max(24, Math.min(event.clientX - rect.left - state.drag.dx, rect.width - 110));
+      item.y = Math.max(18, Math.min(event.clientY - rect.top - state.drag.dy, rect.height - 220));
+      item.z = Math.round(item.y);
+      renderBoard();
+      renderInspector();
+    }
+
+    function endActivePointer() {
+      state.drag = null;
+      state.rotate = null;
+    }
+
     function centerArrange() {
       const count = state.items.length;
       if (!count) return;
@@ -1225,31 +1348,34 @@
       if (!node) return;
       const item = state.items.find(entry => entry.uid === node.dataset.uid);
       state.selectedId = item.uid;
+      event.preventDefault();
+      if (event.target.closest(".handle-dot")) {
+        const origin = flowerOrigin(item);
+        state.rotate = {
+          uid: item.uid,
+          origin,
+          startAngle: pointerAngle(event, origin),
+          baseRotation: item.rotation
+        };
+        state.drag = null;
+        node.setPointerCapture(event.pointerId);
+        renderAll();
+        return;
+      }
+
       const rect = board.getBoundingClientRect();
       state.drag = {
         uid: item.uid,
         dx: event.clientX - rect.left - item.x,
         dy: event.clientY - rect.top - item.y
       };
+      state.rotate = null;
       node.setPointerCapture(event.pointerId);
       renderAll();
     });
 
-    flowerLayer.addEventListener("pointermove", event => {
-      if (!state.drag) return;
-      const item = state.items.find(entry => entry.uid === state.drag.uid);
-      if (!item) return;
-      const rect = board.getBoundingClientRect();
-      item.x = Math.max(24, Math.min(event.clientX - rect.left - state.drag.dx, rect.width - 110));
-      item.y = Math.max(18, Math.min(event.clientY - rect.top - state.drag.dy, rect.height - 220));
-      item.z = Math.round(item.y);
-      renderBoard();
-      renderRecipe();
-    });
-
-    flowerLayer.addEventListener("pointerup", () => {
-      state.drag = null;
-    });
+    window.addEventListener("pointermove", moveActivePointer);
+    window.addEventListener("pointerup", endActivePointer);
 
     board.addEventListener("click", event => {
       if (event.target.closest(".placed-flower")) return;
