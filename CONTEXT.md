@@ -16,3 +16,60 @@
 - 等待用户确认 `docs/diy-preview.html` 的视觉方向。
 - 如果确认继续，再将效果拆分为 Vue 组件，并复用到 `DiyPage.vue` 和 `DiyPlanDetail.vue`。
 - 正式改造时需注意：尽量不引入新依赖；如需真实花材图片，应优先准备透明背景素材或生成轻量 WebP/PNG 资源。
+
+## 新对话接力说明（2026-07-01）
+
+### 当前要做什么
+- 用户准备重开一份新对话，需要新对话快速知道当前进度。
+- 当前核心任务仍是：围绕花卉销售系统的 DIY 花束功能做视觉和交互优化。
+- 用户暂时只想先看 `docs/diy-preview.html` 的效果，不希望在确认前直接改正式 Vue/Java 业务功能。
+
+### 现在做到哪一步了
+- 已经新增独立静态预览页：`docs/diy-preview.html`。
+- 预览页包含：花材架、包装切换、花束工作台、拖拽摆放、旋转缩放、复制删除、示例花束和价格汇总。
+- 预览页已提交并推送：
+  - commit：`7a413cb Add DIY bouquet preview page`
+  - 分支：`master`
+  - 远端：`origin`
+- 正式业务代码尚未迁移改造。
+
+### 下一步怎么推进
+1. 用户先打开 `D:\GProject\flower_trae\flower-sales\docs\diy-preview.html` 看效果。
+2. 如果用户认可方向，再把效果迁移到正式 Vue 组件：
+   - `flower-frontend/src/components/DiyPage.vue`
+   - `flower-frontend/src/components/DiyPlanDetail.vue`
+3. 建议迁移时优先提取一个复用画布组件，例如 `BouquetCanvas.vue`。
+4. 后端可以暂时不改，继续使用当前 `position` JSON 保存 `x/y/rotation/scale`。
+
+### 注意事项
+- `AGENTS.md` 当前是未跟踪文件，不要自动加入提交。
+- 不要安装新依赖；如果确实需要，必须先说明用途和预计大小并获得用户批准。
+- 用户要求“先提出完整方案，确认后再执行”，正式改动前必须先说明方案。
+- 如果后续修改文件，结束前继续更新 `CONTEXT.md`。
+- 如果正式改代码，完成后要自测、提交并推送。
+
+## 给新对话的启动提示词
+
+可以把下面这段直接复制到新对话：
+
+```text
+你现在接手 D:\GProject\flower_trae\flower-sales 项目。
+
+请先阅读根目录的 CONTEXT.md 和 AGENTS.md，再继续工作。当前任务是围绕花卉销售系统的 DIY 花束功能做视觉和交互优化。
+
+背景：
+- 用户觉得现有 DIY 页面样式别扭，不像真实挑花、选包装、自己摆放。
+- 已经新增了一个独立 HTML 预览页：docs/diy-preview.html。
+- 这个预览页只是效果稿，不接入后端，也没有改正式 Vue/Java 业务功能。
+- 预览页包含花材架、包装切换、花束工作台、拖拽摆放、旋转缩放、复制删除、示例花束和价格汇总。
+- 预览页已提交并推送，commit 是 7a413cb Add DIY bouquet preview page。
+
+现在请先不要直接改正式功能。请先帮我基于 docs/diy-preview.html 继续讨论或调整预览效果。等我明确确认后，再把效果迁移到正式 Vue 组件 DiyPage.vue 和 DiyPlanDetail.vue。
+
+工作要求：
+- 修改前先说明完整方案，等我确认后再执行。
+- 不要安装新依赖，除非先说明用途和预计大小并得到许可。
+- 不要提交 AGENTS.md，它是未跟踪文件。
+- 如果修改文件，结束前更新 CONTEXT.md。
+- 如果正式改代码，完成后自测、提交并推送。
+```
