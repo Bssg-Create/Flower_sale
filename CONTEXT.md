@@ -1,5 +1,16 @@
 # 项目上下文记录
 
+## 2026-07-03
+
+### 已完成
+- 继续只修改独立预览页 `docs/diy-preview.html` 和本地素材，未迁移正式 Vue/Java 业务代码。
+- 针对用户反馈“粉玫瑰和康乃馨一模一样、小雏菊不够真实”，新增 3 张本地透明 WebP 花材素材：`docs/assets/diy/pink-rose.webp`、`docs/assets/diy/pink-carnation.webp`、`docs/assets/diy/white-daisy.webp`。
+- 粉玫瑰、康乃馨、小雏菊已改为使用各自独立素材；康乃馨不再复用 `red-rose.webp` 加滤镜，小雏菊不再只使用 CSS 花型模拟。
+- 素材由内置图片生成工具生成，并通过本地色键去背景脚本处理为透明 WebP；未安装新依赖，未直接使用网上图片。
+
+### 待办
+- 用户继续打开 `docs/diy-preview.html` 观察拟真度；如认可素材方向，再继续微调花束构图、层级遮挡和移动端比例。
+
 ## 2026-07-01
 
 ### 已完成
