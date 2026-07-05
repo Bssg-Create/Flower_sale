@@ -162,6 +162,14 @@ const boardPoint = (event) => {
 
 const clamp = (value, min, max) => Math.max(min, Math.min(value, max))
 
+const boardDropPoint = (event) => {
+  const point = boardPoint(event)
+  return snapToBouquetMouth({
+    x: clamp(point.x - 43, 24, BOARD_W - 110),
+    y: clamp(point.y - 94, 18, BOARD_H - 220)
+  })
+}
+
 const snapToBouquetMouth = (point) => {
   const mouth = { x: BOARD_W / 2, y: BOARD_H * 0.66 }
   const stemBase = { x: point.x + 43, y: point.y + 176 }
@@ -349,8 +357,7 @@ const handleDragLeave = (event) => {
 const handleDrop = (event) => {
   if (props.readonly || !props.dragEnabled) return
   dragReady.value = false
-  const point = snapToBouquetMouth(boardPoint(event))
-  emit('drop-flower', point)
+  emit('drop-flower', boardDropPoint(event))
 }
 
 onBeforeUnmount(() => {
