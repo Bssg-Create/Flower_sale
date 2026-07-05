@@ -128,8 +128,8 @@ const assetByName = [
 const packageClass = computed(() => {
   const name = props.packageType || ''
   if (name.includes('心') || name.includes('豆沙') || name.includes('粉')) return 'package-blush'
-  if (name.includes('长') || name.includes('森') || name.includes('绿')) return 'package-forest'
-  if (name.includes('礼盒') || name.includes('紫')) return 'package-gift'
+  if (name.includes('长') || name.includes('森') || name.includes('绿') || name.includes('雾绿')) return 'package-forest'
+  if (name.includes('礼盒') || name.includes('礼赠') || name.includes('紫') || name.includes('灰')) return 'package-gift'
   return 'package-paper'
 })
 

@@ -76,7 +76,7 @@
               <span>包装</span>
               <select v-model="selectedPackage">
                 <option v-for="pkg in packages" :key="pkg.id" :value="pkg.id">
-                  {{ pkg.name }} / ¥{{ Number(pkg.price || 0).toFixed(2) }}
+                  {{ displayPackageName(pkg.name) }} / ¥{{ Number(pkg.price || 0).toFixed(2) }}
                 </option>
               </select>
             </div>
@@ -85,7 +85,7 @@
           <BouquetCanvas
             v-model="designItems"
             v-model:selected-index="selectedIndex"
-            :package-type="currentPackage.name"
+            :package-type="currentPackageName"
             :message="messageText"
             :drag-enabled="!!draggedFlower"
             @drop-flower="handleCanvasDrop"
@@ -207,12 +207,19 @@ const flowerProfiles = [
   { key: '尤加利叶', asset: 'eucalyptus.webp', photoWidth: 132, photoHeight: 220, tags: ['自然', '森系'] }
 ]
 
+const packageNameMap = {
+  '圆形包装': '米白牛皮纸韩式包装',
+  '心形包装': '豆沙粉雾面纸包装',
+  '长形包装': '雾绿森系韩式包装',
+  '礼盒包装': '紫灰礼赠纸艺包装'
+}
+
 const templates = [
   {
     id: 'confession',
     name: '告白红玫瑰',
     note: '红玫瑰为主，适合表白和纪念日',
-    packageName: '心形包装',
+    packageName: '豆沙粉雾面纸包装',
     message: '想把今天的浪漫，都交给你',
     items: [['尤加利叶', 158, 92, -34, 1.12, 10], ['尤加利叶', 318, 94, 32, 1.1, 11], ['白玫瑰', 206, 120, -15, 0.98, 18], ['红玫瑰', 238, 104, -3, 1.14, 26], ['红玫瑰', 276, 128, 13, 1.08, 27], ['粉玫瑰', 198, 162, -22, 0.96, 23], ['粉郁金香', 316, 166, 20, 0.94, 21], ['小雏菊', 170, 198, -28, 0.82, 19], ['小雏菊', 344, 196, 27, 0.82, 20]]
   },
@@ -220,7 +227,7 @@ const templates = [
     id: 'forest',
     name: '森系自然风',
     note: '叶材拉开轮廓，适合清新日常礼',
-    packageName: '长形包装',
+    packageName: '雾绿森系韩式包装',
     message: '愿你被温柔和绿意包围',
     items: [['尤加利叶', 152, 82, -36, 1.18, 10], ['尤加利叶', 326, 84, 34, 1.16, 11], ['尤加利叶', 236, 72, 0, 1.04, 12], ['白百合', 204, 124, -13, 1.02, 22], ['小雏菊', 266, 120, 9, 0.92, 21], ['白玫瑰', 238, 154, -3, 1.04, 26], ['黄郁金香', 308, 164, 21, 0.92, 24], ['小雏菊', 178, 198, -24, 0.86, 20]]
   },
@@ -228,7 +235,7 @@ const templates = [
     id: 'birthday',
     name: '生日向日葵',
     note: '明亮主花，适合生日和鼓励',
-    packageName: '圆形包装',
+    packageName: '米白牛皮纸韩式包装',
     message: '生日快乐，愿你一路向阳',
     items: [['尤加利叶', 176, 104, -26, 1.04, 10], ['尤加利叶', 316, 106, 27, 1.04, 11], ['向日葵', 216, 100, -10, 1.12, 26], ['向日葵', 278, 112, 12, 1.08, 27], ['黄郁金香', 190, 164, -20, 0.96, 22], ['粉百合', 314, 164, 20, 0.94, 21], ['康乃馨', 240, 170, 0, 0.98, 25], ['小雏菊', 166, 200, -28, 0.82, 18], ['小雏菊', 344, 198, 29, 0.82, 19]]
   },
@@ -236,7 +243,7 @@ const templates = [
     id: 'gentle',
     name: '温柔粉白',
     note: '粉白低饱和，适合感谢和探望',
-    packageName: '礼盒包装',
+    packageName: '紫灰礼赠纸艺包装',
     message: '把轻轻的祝福送给你',
     items: [['尤加利叶', 174, 98, -28, 1.04, 10], ['尤加利叶', 314, 100, 27, 1.04, 11], ['白百合', 214, 112, -10, 1.04, 23], ['粉百合', 276, 124, 10, 0.98, 24], ['白玫瑰', 238, 150, -3, 1.04, 26], ['粉玫瑰', 198, 166, -20, 0.94, 22], ['粉郁金香', 318, 168, 20, 0.92, 21], ['小雏菊', 168, 200, -29, 0.82, 18], ['小雏菊', 342, 198, 29, 0.82, 19]]
   }
@@ -244,6 +251,7 @@ const templates = [
 
 const filteredFlowers = computed(() => selectedCategory.value === 0 ? flowers.value : flowers.value.filter(f => f.categoryId === selectedCategory.value))
 const currentPackage = computed(() => packages.value.find(p => p.id === selectedPackage.value) || packages.value[0] || { name: '圆形包装', price: 10 })
+const currentPackageName = computed(() => displayPackageName(currentPackage.value.name))
 const totalFlowers = computed(() => designItems.value.reduce((sum, item) => sum + (item.quantity || 1), 0))
 const flowersTotal = computed(() => designItems.value.reduce((sum, item) => sum + Number(item.price || 0) * (item.quantity || 1), 0))
 const totalPrice = computed(() => flowersTotal.value + Number(currentPackage.value.price || 0))
@@ -274,6 +282,7 @@ const encodeUrl = (url) => {
 }
 
 const getProfile = (name) => flowerProfiles.find(profile => (name || '').includes(profile.key)) || null
+const displayPackageName = (name) => packageNameMap[name] || name || '米白牛皮纸韩式包装'
 const getFlowerImage = (flower) => {
   const profile = getProfile(flower.name || flower.flowerName)
   return profile?.asset ? `/images/diy/${profile.asset}` : encodeUrl(flower.imageUrl)
@@ -339,7 +348,7 @@ const loadTemplate = (templateId) => {
   selectedIndex.value = Math.floor(nextItems.length / 2)
   activeTemplate.value = template.id
   messageText.value = template.message
-  const pkg = packages.value.find(item => item.name === template.packageName)
+  const pkg = packages.value.find(item => item.name === template.packageName || displayPackageName(item.name) === template.packageName)
   if (pkg) selectedPackage.value = pkg.id
 }
 
@@ -384,7 +393,7 @@ const saveDesign = async () => {
     const res = await api.post('/diy/save', {
       userId,
       name: '我的花束设计',
-      packageType: pkg.name,
+      packageType: displayPackageName(pkg.name),
       totalPrice: totalPrice.value,
       items: designItems.value.map(item => ({
         flowerId: item.flowerId,

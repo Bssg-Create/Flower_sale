@@ -11,13 +11,13 @@
         <div class="plan-preview-card">
           <BouquetCanvas
             :model-value="designItems"
-            :package-type="plan.packageType || '圆形包装'"
+            :package-type="packageDisplayName"
             :message="messageText"
             readonly
             compact
           />
           <h2>{{ plan.name }}</h2>
-          <p class="preview-pkg">包装: {{ plan.packageType || '无' }}</p>
+          <p class="preview-pkg">包装: {{ packageDisplayName }}</p>
           <p class="preview-price">¥{{ Number(plan.totalPrice || 0).toFixed(2) }}</p>
           <p class="preview-status">{{ statusText(plan.status) }}</p>
         </div>
@@ -90,6 +90,13 @@ const flowerProfiles = [
   { key: '尤加利叶', asset: 'eucalyptus.webp', photoWidth: 132, photoHeight: 220 }
 ]
 
+const packageNameMap = {
+  '圆形包装': '米白牛皮纸韩式包装',
+  '心形包装': '豆沙粉雾面纸包装',
+  '长形包装': '雾绿森系韩式包装',
+  '礼盒包装': '紫灰礼赠纸艺包装'
+}
+
 const statusText = (s) => {
   if (s === 'ordered') return '已下单'
   if (s === 'saved' || s === '1') return '已保存'
@@ -97,6 +104,8 @@ const statusText = (s) => {
 }
 
 const getProfile = (name) => flowerProfiles.find(profile => (name || '').includes(profile.key)) || null
+const displayPackageName = (name) => packageNameMap[name] || name || '无'
+const packageDisplayName = computed(() => displayPackageName(plan.value?.packageType))
 
 const getFlowerImage = (name) => {
   const profile = getProfile(name)
