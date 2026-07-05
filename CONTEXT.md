@@ -1,5 +1,61 @@
 # 项目上下文记录
 
+## 2026-07-05（新对话接力：DIY 正式页 preview 风格后续验证）
+
+### 当前最新状态
+- 本地最新提交：`f181dd0 Align DIY page style with preview assets`。
+- 已推送到确认远端：`https://github.com/Bssg-Create/Flower_sale.git` 的 `master` 分支。
+- Git 工作区在本次交接前保持干净。
+- 正式 DIY Vue 功能仍通过路由使用：
+  - `/user/diy` → `flower-frontend/src/components/DiyPageMigrated.vue`
+  - `/user/plan/:id` → `flower-frontend/src/components/DiyPlanDetailMigrated.vue`
+  - 共享真实花束画布：`flower-frontend/src/components/BouquetCanvas.vue`
+- 前端 Axios `baseURL` 是 `/api`，Vite 代理到 `http://localhost:8081`；正确后端接口前缀是 `/api/diy`，不要改成 `/diy`。
+
+### 最近已完成
+- 修复开发环境图片不显示：`flower-frontend/vite.config.js` 已新增 `/images` 代理到 `http://localhost:8081`，让 `http://127.0.0.1:5173/images/diy/*.webp` 能转发到后端静态资源。
+- 用户确认正式 DIY 页可以继续按照 `docs/diy-preview.html` 的真实花束定制方向推进，但保留当前系统顶部导航和业务流程，避免风格突兀。
+- 已新增两张本地透明 WebP 花材素材：
+  - `imags/diy/yellow-rose.webp`
+  - `imags/diy/red-tulip.webp`
+- 已同步两张素材到后端静态资源源码目录：
+  - `flower-web/src/main/resources/static/images/diy/yellow-rose.webp`
+  - `flower-web/src/main/resources/static/images/diy/red-tulip.webp`
+- 为当前已运行的 8081 后端实例，曾同步两张素材到 `flower-web/target/classes/static/images/diy/`，让当前运行态无需重启也能访问；`target` 目录不提交。
+- 已补齐 `黄玫瑰`、`红郁金香` 在以下组件的素材映射：
+  - `DiyPageMigrated.vue`
+  - `DiyPlanDetailMigrated.vue`
+  - `BouquetCanvas.vue`
+- `DiyPageMigrated.vue` 内容区已进一步贴近 `docs/diy-preview.html`：暖纸面背景、细边框、轻纸纹、红绿花艺点缀、模板卡/花材卡/右侧清单的预览页质感；顶部系统导航未改。
+
+### 已验证
+- `flower-frontend` 下 `npm run build` 通过；沙箱内 esbuild 会报 `spawn EPERM`，需要提升权限运行构建。
+- `http://127.0.0.1:8081/images/diy/yellow-rose.webp` 返回 `200` 和 `content-type: image/webp`。
+- `http://127.0.0.1:8081/images/diy/red-tulip.webp` 返回 `200` 和 `content-type: image/webp`。
+- `http://127.0.0.1:5173/images/diy/yellow-rose.webp` 返回 `200 OK` 和 `content-type: image/webp`。
+- `http://127.0.0.1:5173/images/diy/red-tulip.webp` 返回 `200 OK` 和 `content-type: image/webp`。
+- `/api/diy/flowers` 数据包含 `黄玫瑰` 和 `红郁金香`，新映射会命中。
+
+### 下一步建议
+1. 先让用户刷新或强刷 `http://127.0.0.1:5173/#/user/diy`，查看正式页面视觉是否已经足够接近 `docs/diy-preview.html`。
+2. 如果用户认可视觉方向，继续做页面级验证：
+   - 花材架真实 WebP 缩略图是否全部显示。
+   - 模板是否能载入花束。
+   - 拖拽、束口吸附、旋转缩放、复制删除、层级调整是否正常。
+   - 保存方案后进入详情页，确认花束能按 `position` JSON 还原。
+   - 移动端横向花材挑选体验是否正常。
+3. 如果效果稳定，再考虑整理命名：
+   - `DiyPageMigrated.vue` 重命名回 `DiyPage.vue`
+   - `DiyPlanDetailMigrated.vue` 重命名回 `DiyPlanDetail.vue`
+   - 清理旧 SVG 逻辑组件
+
+### 工作要求提醒
+- 修改前先说明完整方案，得到用户确认后再执行。
+- 不新增依赖；如确实需要，先说明用途和预计大小并获得许可。
+- 不使用网络图片；继续使用本地生成/透明 WebP 素材。
+- 图片源目录按项目约定使用 `imags/diy`，并同步到 `flower-web/src/main/resources/static/images/diy`；页面通过 `/images/diy/*.webp` 访问。
+- 每次修改后自测、更新 `CONTEXT.md`、检查敏感信息、提交并推送。
+
 ## 2026-07-05（DIY 正式页面贴近 preview 风格并补花材）
 
 ### 已完成
