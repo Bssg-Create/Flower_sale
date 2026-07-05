@@ -535,10 +535,10 @@
 
     .snap-halo {
       position: absolute;
-      left: 226px;
-      top: 374px;
-      width: 108px;
-      height: 58px;
+      left: 218px;
+      top: 352px;
+      width: 124px;
+      height: 64px;
       border-radius: 50%;
       border: 1px dashed rgba(47, 115, 86, 0.3);
       background: radial-gradient(ellipse at center, rgba(47, 115, 86, 0.12), transparent 68%);
@@ -549,9 +549,31 @@
       z-index: 2;
     }
 
+    .snap-halo::after {
+      content: "贴近束口";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 252, 243, 0.9);
+      color: rgba(47, 86, 64, 0.86);
+      font-size: 11px;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 10px rgba(54, 43, 28, 0.12);
+    }
+
     .bouquet-board.snap-active .snap-halo {
       opacity: 1;
       transform: scale(1);
+    }
+
+    .bouquet-board.snap-active .wrap-neck {
+      box-shadow:
+        inset 0 12px 18px rgba(255,255,255,0.18),
+        0 0 0 2px rgba(47, 115, 86, 0.08),
+        0 10px 22px rgba(69, 48, 31, 0.2);
     }
 
     .wrap-layer {
@@ -628,6 +650,18 @@
       z-index: 5;
     }
 
+    .wrap-left::before,
+    .wrap-right::before {
+      content: "";
+      position: absolute;
+      inset: 12px 22px 24px;
+      background:
+        linear-gradient(112deg, transparent 0 44%, rgba(255,255,255,0.28) 45% 47%, transparent 48%),
+        linear-gradient(74deg, transparent 0 55%, rgba(63, 48, 34, 0.1) 56% 58%, transparent 59%);
+      opacity: 0.72;
+      pointer-events: none;
+    }
+
     .wrap-right {
       right: 112px;
       top: 250px;
@@ -665,16 +699,21 @@
       filter: blur(3px);
     }
 
+    .wrap-front::after {
+      opacity: 0.64;
+    }
+
     .stem-bundle {
-      left: 243px;
-      top: 364px;
-      width: 76px;
-      height: 150px;
+      left: 232px;
+      top: 344px;
+      width: 98px;
+      height: 176px;
       background:
-        linear-gradient(83deg, transparent 0 18%, #315e3e 19% 22%, transparent 23% 30%, #6d995d 31% 34%, transparent 35% 45%, #2c6844 46% 49%, transparent 50% 60%, #789a62 61% 64%, transparent 65%),
+        linear-gradient(72deg, transparent 0 12%, #315e3e 13% 15%, transparent 16% 26%, #6d995d 27% 29%, transparent 30% 42%, #2c6844 43% 45%, transparent 46% 56%, #789a62 57% 59%, transparent 60% 72%, #486f47 73% 75%, transparent 76%),
+        linear-gradient(106deg, transparent 0 18%, rgba(38, 91, 59, 0.72) 19% 21%, transparent 22% 38%, rgba(104, 142, 83, 0.64) 39% 41%, transparent 42%),
         linear-gradient(180deg, rgba(49, 94, 62, 0.86), rgba(79, 113, 61, 0.42));
-      clip-path: polygon(24% 0, 76% 0, 94% 100%, 6% 100%);
-      opacity: 0.72;
+      clip-path: polygon(9% 0, 91% 0, 72% 100%, 28% 100%);
+      opacity: 0.78;
       filter: drop-shadow(0 8px 10px rgba(45, 35, 24, 0.18));
       z-index: 4;
     }
@@ -684,10 +723,10 @@
     }
 
     .wrap-neck {
-      left: 200px;
-      top: 386px;
-      width: 162px;
-      height: 72px;
+      left: 196px;
+      top: 378px;
+      width: 170px;
+      height: 78px;
       border-radius: 46% 46% 42% 42%;
       background:
         radial-gradient(ellipse at 50% 38%, rgba(56, 38, 24, 0.22), transparent 58%),
@@ -698,6 +737,18 @@
         inset 0 12px 18px rgba(255,255,255,0.16),
         0 8px 18px rgba(69, 48, 31, 0.18);
       z-index: 6;
+    }
+
+    .wrap-neck::before {
+      content: "";
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: -9px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(48, 35, 24, 0.26), rgba(48, 35, 24, 0.04) 62%, transparent 72%);
+      filter: blur(2px);
     }
 
     .wrap-neck::after {
@@ -857,10 +908,15 @@
     }
 
     .placed-flower.selected {
-      outline: 1px dashed rgba(180, 70, 70, 0.72);
-      outline-offset: 6px;
+      outline: 1px dashed rgba(180, 70, 70, 0.56);
+      outline-offset: 5px;
       z-index: 999 !important;
       filter: drop-shadow(0 10px 10px rgba(42, 35, 28, 0.2));
+    }
+
+    .placed-flower.dragging {
+      filter: drop-shadow(0 16px 14px rgba(42, 35, 28, 0.2));
+      transition: none;
     }
 
     .placed-flower .stem {
@@ -1546,17 +1602,17 @@
         packageId: "blush",
         message: "想把今天的浪漫，都交给你",
         items: [
-          ["eucalyptus", 178, 110, -26, 1.06, 10],
-          ["eucalyptus", 306, 112, 24, 1.04, 11],
-          ["baby-breath", 156, 132, -30, 0.82, 14],
-          ["baby-breath", 332, 136, 30, 0.8, 15],
-          ["white-rose", 210, 126, -14, 0.98, 18],
-          ["red-rose", 238, 112, -4, 1.14, 24],
-          ["red-rose", 272, 134, 12, 1.08, 25],
-          ["pink-rose", 198, 156, -20, 0.96, 22],
-          ["pink-tulip", 314, 158, 18, 0.94, 20],
-          ["daisy", 160, 186, -30, 0.82, 16],
-          ["daisy", 350, 184, 28, 0.82, 17]
+          ["eucalyptus", 158, 92, -34, 1.12, 10],
+          ["eucalyptus", 318, 94, 32, 1.1, 11],
+          ["baby-breath", 150, 124, -33, 0.84, 14],
+          ["baby-breath", 338, 126, 32, 0.82, 15],
+          ["white-rose", 206, 120, -15, 0.98, 18],
+          ["red-rose", 238, 104, -3, 1.14, 26],
+          ["red-rose", 276, 128, 13, 1.08, 27],
+          ["pink-rose", 198, 162, -22, 0.96, 23],
+          ["pink-tulip", 316, 166, 20, 0.94, 21],
+          ["daisy", 170, 198, -28, 0.82, 19],
+          ["daisy", 344, 196, 27, 0.82, 20]
         ]
       },
       {
@@ -1566,16 +1622,16 @@
         packageId: "forest",
         message: "愿你被温柔和绿意包围",
         items: [
-          ["eucalyptus", 166, 96, -32, 1.14, 10],
-          ["eucalyptus", 314, 98, 32, 1.12, 11],
-          ["eucalyptus", 238, 86, 2, 1.02, 12],
-          ["baby-breath", 178, 134, -24, 0.82, 16],
-          ["baby-breath", 332, 136, 28, 0.78, 17],
-          ["white-lily", 206, 130, -12, 1.02, 20],
-          ["daisy", 260, 126, 10, 0.92, 21],
-          ["white-rose", 236, 152, -4, 1.04, 24],
-          ["yellow-tulip", 302, 158, 20, 0.92, 22],
-          ["daisy", 178, 184, -24, 0.86, 18]
+          ["eucalyptus", 152, 82, -36, 1.18, 10],
+          ["eucalyptus", 326, 84, 34, 1.16, 11],
+          ["eucalyptus", 236, 72, 0, 1.04, 12],
+          ["baby-breath", 170, 128, -26, 0.84, 16],
+          ["baby-breath", 336, 132, 30, 0.8, 17],
+          ["white-lily", 204, 124, -13, 1.02, 22],
+          ["daisy", 266, 120, 9, 0.92, 21],
+          ["white-rose", 238, 154, -3, 1.04, 26],
+          ["yellow-tulip", 308, 164, 21, 0.92, 24],
+          ["daisy", 178, 198, -24, 0.86, 20]
         ]
       },
       {
@@ -1585,17 +1641,17 @@
         packageId: "paper",
         message: "生日快乐，愿你一路向阳",
         items: [
-          ["eucalyptus", 188, 118, -22, 1.02, 10],
-          ["eucalyptus", 306, 120, 24, 1.02, 11],
-          ["baby-breath", 160, 148, -28, 0.8, 15],
-          ["baby-breath", 348, 148, 30, 0.78, 16],
-          ["sunflower", 220, 106, -10, 1.12, 24],
-          ["sunflower", 274, 116, 12, 1.08, 25],
-          ["yellow-tulip", 190, 158, -18, 0.96, 21],
-          ["pink-lily", 312, 154, 18, 0.94, 20],
-          ["carnation", 238, 160, 0, 0.98, 23],
-          ["daisy", 158, 188, -30, 0.82, 16],
-          ["daisy", 350, 188, 30, 0.82, 17]
+          ["eucalyptus", 176, 104, -26, 1.04, 10],
+          ["eucalyptus", 316, 106, 27, 1.04, 11],
+          ["baby-breath", 154, 140, -30, 0.82, 15],
+          ["baby-breath", 352, 142, 31, 0.8, 16],
+          ["sunflower", 216, 100, -10, 1.12, 26],
+          ["sunflower", 278, 112, 12, 1.08, 27],
+          ["yellow-tulip", 190, 164, -20, 0.96, 22],
+          ["pink-lily", 314, 164, 20, 0.94, 21],
+          ["carnation", 240, 170, 0, 0.98, 25],
+          ["daisy", 166, 200, -28, 0.82, 18],
+          ["daisy", 344, 198, 29, 0.82, 19]
         ]
       },
       {
@@ -1605,17 +1661,17 @@
         packageId: "gift",
         message: "把轻轻的祝福送给你",
         items: [
-          ["eucalyptus", 184, 112, -24, 1.02, 10],
-          ["eucalyptus", 306, 112, 24, 1.02, 11],
-          ["baby-breath", 160, 138, -30, 0.78, 15],
-          ["baby-breath", 346, 138, 30, 0.78, 16],
-          ["white-lily", 216, 116, -10, 1.04, 22],
-          ["pink-lily", 274, 126, 10, 0.98, 23],
-          ["white-rose", 236, 148, -4, 1.04, 24],
-          ["pink-rose", 198, 158, -18, 0.94, 21],
-          ["pink-tulip", 316, 160, 18, 0.92, 20],
-          ["daisy", 160, 186, -30, 0.82, 16],
-          ["daisy", 348, 186, 30, 0.82, 17]
+          ["eucalyptus", 174, 98, -28, 1.04, 10],
+          ["eucalyptus", 314, 100, 27, 1.04, 11],
+          ["baby-breath", 154, 132, -31, 0.8, 15],
+          ["baby-breath", 350, 134, 31, 0.8, 16],
+          ["white-lily", 214, 112, -10, 1.04, 23],
+          ["pink-lily", 276, 124, 10, 0.98, 24],
+          ["white-rose", 238, 150, -3, 1.04, 26],
+          ["pink-rose", 198, 166, -20, 0.94, 22],
+          ["pink-tulip", 318, 168, 20, 0.92, 21],
+          ["daisy", 168, 200, -29, 0.82, 18],
+          ["daisy", 342, 198, 29, 0.82, 19]
         ]
       }
     ];
@@ -1721,7 +1777,10 @@
     function createFlowerNode(item) {
       const flower = flowers.find(f => f.id === item.flowerId);
       const node = document.createElement("div");
-      node.className = "placed-flower" + (flower.asset ? " has-photo" : "") + (item.uid === state.selectedId ? " selected" : "");
+      node.className = "placed-flower"
+        + (flower.asset ? " has-photo" : "")
+        + (item.uid === state.selectedId ? " selected" : "")
+        + (state.drag?.uid === item.uid ? " dragging" : "");
       node.dataset.uid = item.uid;
       node.style.left = item.x + "px";
       node.style.top = item.y + "px";
@@ -1870,16 +1929,17 @@
     }
 
     function snapToBouquetMouth(point, width = 560, height = 600) {
-      const mouth = { x: width / 2 - 43, y: height * 0.58 };
-      const dx = point.x - mouth.x;
-      const dy = point.y - mouth.y;
+      const mouth = { x: width / 2, y: height * 0.66 };
+      const stemBase = { x: point.x + 43, y: point.y + 176 };
+      const dx = stemBase.x - mouth.x;
+      const dy = stemBase.y - mouth.y;
       const distance = Math.hypot(dx, dy);
-      if (distance > 90) {
+      if (distance > 112) {
         return { ...point, snapped: false };
       }
       return {
-        x: Math.round(point.x - dx * 0.38),
-        y: Math.round(point.y - dy * 0.46),
+        x: Math.round(point.x - dx * 0.5),
+        y: Math.round(point.y - dy * 0.58),
         snapped: true
       };
     }
@@ -1999,11 +2059,11 @@
       state.items.forEach((item, index) => {
         const offset = index - (count - 1) / 2;
         const fan = count > 1 ? offset / ((count - 1) / 2) : 0;
-        item.x = 238 + offset * 21;
-        item.y = 110 + Math.abs(offset) * 12 + (index % 3) * 7;
-        item.rotation = Math.round(fan * 24);
+        item.x = 238 + fan * 104 + (index % 2 ? 8 : -6);
+        item.y = 104 + Math.abs(fan) * 58 + (index % 3) * 11;
+        item.rotation = Math.round(fan * 30);
         item.scale = Math.max(0.84, Math.min(item.scale, 1.12));
-        item.z = 30 + index;
+        item.z = Math.round(item.y) + index;
       });
       renderAll();
     }
