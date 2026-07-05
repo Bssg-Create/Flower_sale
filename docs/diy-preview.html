@@ -533,6 +533,18 @@
       opacity: 0;
     }
 
+    .bouquet-board.drag-ready {
+      border-color: rgba(47, 115, 86, 0.34);
+      box-shadow:
+        0 0 0 4px rgba(47, 115, 86, 0.08),
+        var(--shadow);
+    }
+
+    .bouquet-board.drag-ready .drop-hint {
+      opacity: 1;
+      color: rgba(47, 86, 64, 0.86);
+    }
+
     .snap-halo {
       position: absolute;
       left: 218px;
@@ -883,6 +895,7 @@
       transform-origin: 50% 92%;
       cursor: move;
       user-select: none;
+      touch-action: none;
       filter: drop-shadow(0 8px 8px rgba(42, 35, 28, 0.16));
       transition: filter 0.16s;
     }
@@ -1387,13 +1400,64 @@
         flex-direction: column;
       }
 
+      .top-actions {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .top-actions .primary-btn {
+        flex: 1;
+      }
+
       .workspace {
         grid-template-columns: 1fr;
         padding: 12px;
       }
 
+      .template-strip {
+        order: 0;
+      }
+
+      .stage-panel {
+        order: 1;
+      }
+
+      .flower-panel {
+        order: 2;
+        max-height: none;
+      }
+
+      .inspector-panel {
+        order: 3;
+      }
+
       .template-list {
-        grid-template-columns: 1fr;
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scroll-snap-type: x proximity;
+      }
+
+      .template-card {
+        min-width: 184px;
+        scroll-snap-align: start;
+      }
+
+      .filter-row {
+        grid-template-columns: repeat(4, minmax(76px, 1fr));
+        overflow-x: auto;
+      }
+
+      .flower-list {
+        display: flex;
+        gap: 10px;
+        padding: 0 14px 14px;
+        overflow-x: auto;
+      }
+
+      .flower-option {
+        min-width: 236px;
+        margin-bottom: 0;
       }
 
       .canvas-wrap {
@@ -1577,9 +1641,9 @@
       { id: "white-rose", name: "白玫瑰", category: "玫瑰", price: 14, form: "rose", color: "#f6f1e8", soft: "#ffffff", deep: "#d8d0c1", core: "#c99736", asset: "white-rose.webp", photoWidth: 126, photoHeight: 226, tags: ["纯净", "纪念"] },
       { id: "pink-rose", name: "粉玫瑰", category: "玫瑰", price: 15, form: "rose", color: "#e98d9f", soft: "#ffc3cf", deep: "#bf5c73", core: "#88495b", asset: "pink-rose.webp", photoWidth: 126, photoHeight: 226, tags: ["温柔", "心意"] },
       { id: "pink-tulip", name: "粉郁金香", category: "郁金香", price: 18, form: "tulip", color: "#e987b0", soft: "#ffc7dc", deep: "#ba5984", core: "#b44646", asset: "pink-tulip.webp", photoWidth: 120, photoHeight: 226, tags: ["浪漫", "春日"] },
-      { id: "yellow-tulip", name: "黄郁金香", category: "郁金香", price: 18, form: "tulip", color: "#efc04b", soft: "#ffe082", deep: "#c78922", core: "#8a5a18", asset: "pink-tulip.webp", photoWidth: 120, photoHeight: 226, filter: "hue-rotate(70deg) saturate(1.22) brightness(1.08)", tags: ["祝福", "活力"] },
+      { id: "yellow-tulip", name: "黄郁金香", category: "郁金香", price: 18, form: "tulip", color: "#efc04b", soft: "#ffe082", deep: "#c78922", core: "#8a5a18", asset: "yellow-tulip.webp", photoWidth: 122, photoHeight: 236, tags: ["祝福", "活力"] },
       { id: "white-lily", name: "白百合", category: "百合", price: 20, form: "lily", color: "#faf8ed", soft: "#ffffff", deep: "#e4dac3", core: "#c99736", asset: "white-lily.webp", photoWidth: 132, photoHeight: 228, tags: ["高雅", "慰问"] },
-      { id: "pink-lily", name: "粉百合", category: "百合", price: 22, form: "lily", color: "#f0a5b4", soft: "#ffd1d8", deep: "#bd6a7e", core: "#a86a2f", asset: "white-lily.webp", photoWidth: 132, photoHeight: 228, filter: "hue-rotate(315deg) saturate(0.9) brightness(1.05)", tags: ["甜美", "生日"] },
+      { id: "pink-lily", name: "粉百合", category: "百合", price: 22, form: "lily", color: "#f0a5b4", soft: "#ffd1d8", deep: "#bd6a7e", core: "#a86a2f", asset: "pink-lily.webp", photoWidth: 154, photoHeight: 238, tags: ["甜美", "生日"] },
       { id: "sunflower", name: "向日葵", category: "主花", price: 12, form: "sun", color: "#f2bd2e", soft: "#ffdb62", deep: "#d98b23", core: "#5b3b1f", asset: "sunflower.webp", photoWidth: 136, photoHeight: 226, tags: ["阳光", "鼓励"] },
       { id: "carnation", name: "康乃馨", category: "主花", price: 12, form: "rose", color: "#d95b77", soft: "#ff9caf", deep: "#a93b5b", core: "#7a2a43", asset: "pink-carnation.webp", photoWidth: 118, photoHeight: 222, tags: ["感恩", "亲情"] },
       { id: "daisy", name: "小雏菊", category: "配花", price: 8, form: "lily", color: "#fffdf3", soft: "#ffffff", deep: "#ece1c0", core: "#e7b72f", asset: "white-daisy.webp", photoWidth: 128, photoHeight: 226, tags: ["清新", "陪伴"] },
@@ -1686,6 +1750,7 @@
       drag: null,
       rotate: null,
       snapActive: false,
+      dragReady: false,
       nextId: 1
     };
 
@@ -1825,7 +1890,10 @@
         .forEach(item => flowerLayer.appendChild(createFlowerNode(item)));
 
       const pkg = packages.find(p => p.id === state.packageId);
-      board.className = "bouquet-board " + pkg.className + (state.items.length ? " has-items" : "") + (state.snapActive ? " snap-active" : "");
+      board.className = "bouquet-board " + pkg.className
+        + (state.items.length ? " has-items" : "")
+        + (state.snapActive ? " snap-active" : "")
+        + (state.dragReady ? " drag-ready" : "");
     }
 
     function renderRecipe() {
@@ -2107,15 +2175,31 @@
       event.dataTransfer.effectAllowed = "copy";
     });
 
+    flowerList.addEventListener("dragend", () => {
+      state.dragReady = false;
+      renderBoard();
+    });
+
     board.addEventListener("dragover", event => {
       event.preventDefault();
+      if (!state.dragReady) {
+        state.dragReady = true;
+        renderBoard();
+      }
     });
 
     board.addEventListener("drop", event => {
       event.preventDefault();
+      state.dragReady = false;
       const flowerId = event.dataTransfer.getData("text/plain");
       if (!flowerId) return;
       addFlower(flowerId, boardPoint(event.clientX, event.clientY));
+    });
+
+    board.addEventListener("dragleave", event => {
+      if (board.contains(event.relatedTarget)) return;
+      state.dragReady = false;
+      renderBoard();
     });
 
     packageList.addEventListener("click", event => {
