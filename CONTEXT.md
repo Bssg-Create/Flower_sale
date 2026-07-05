@@ -1,5 +1,59 @@
 # 项目上下文记录
 
+## 2026-07-05（重开对话前：IDEA MCP 启动验证）
+
+### 当前最新状态
+- 本地最新提交：`0c3b0cb Migrate DIY bouquet canvas to Vue`。
+- 已推送到确认远端：`https://github.com/Bssg-Create/Flower_sale.git` 的 `master` 分支。
+- Git 工作区在验证后保持干净。
+- 正式 DIY Vue 功能已迁移完成，当前路由已指向：
+  - `/user/diy` → `flower-frontend/src/components/DiyPageMigrated.vue`
+  - `/user/plan/:id` → `flower-frontend/src/components/DiyPlanDetailMigrated.vue`
+- 共享真实花束画布为：`flower-frontend/src/components/BouquetCanvas.vue`。
+
+### 图片目录约定
+- 用户明确项目图片源目录是 `D:\GProject\flower_trae\flower-sales\imags`。
+- 本轮新增 DIY WebP 素材已放入：
+  - `imags/diy/`
+  - `flower-web/src/main/resources/static/images/diy/`
+- 正式页面通过 `/images/diy/*.webp` 访问真实感花材和包装纸纹理。
+- `flower-web/src/main/resources/static/images/diy/red-rose.webp` 已验证可通过 `http://127.0.0.1:8081/images/diy/red-rose.webp` 访问，返回 `200` 和 `Content-Type: image/webp`。
+
+### IDEA MCP 启动与验证结果
+- 用户要求通过 IntelliJ IDEA MCP 连接 IDEA 并启动/验证项目。
+- IDEA 中检测到两个同名 `FlowerApplication` 运行配置；为避免歧义，曾用 `flower-web/src/main/java/com/flower/FlowerApplication.java` 的 main 运行点启动。
+- IDEA 启动日志显示 `8081` 已被占用；后续确认占用进程是当前项目的 `java.exe ... com.flower.FlowerApplication`，PID 为 `2876`。
+- 曾尝试用 IDEA MCP 在 `8082` 启动新后端实例，但用户拒绝了该命令执行；因此继续使用现有 `8081` 后端实例验证。
+- 前端通过 IDEA 终端启动后，`http://127.0.0.1:5173/` 返回 `HTTP/1.1 200 OK`。
+- 正确后端接口前缀是 `/api/diy`，因为：
+  - `flower-frontend/src/api/index.js` 的 `baseURL` 是 `/api`
+  - `flower-frontend/vite.config.js` 将 `/api` 代理到 `http://localhost:8081`
+  - `DiyController` 上有 `@RequestMapping("/api/diy")`
+- 注意：直接访问 `/diy/flowers` 是错误路径，会得到 500；正确路径为 `/api/diy/flowers`。
+- 已验证：
+  - `http://127.0.0.1:8081/api/diy/flowers` 返回 `code:200`
+  - `http://127.0.0.1:8081/api/diy/package/list` 返回 `code:200`
+  - `http://127.0.0.1:5173/api/diy/flowers` 通过前端代理返回 `code:200`
+- IDEA 文件问题检查结果：
+  - `BouquetCanvas.vue` 无 errors
+  - `DiyPageMigrated.vue` 无 errors
+  - `DiyPlanDetailMigrated.vue` 无 errors
+- 浏览器插件要求的 Node REPL 控制工具本轮没有暴露，因此未完成截图级页面验证；但前端服务、后端接口、静态图片和 IDEA 文件检查均已通过。
+
+### 下一次对话建议
+- 先读取 `CONTEXT.md` 和 `AGENTS.md`。
+- 如继续验证，应打开 `http://127.0.0.1:5173/#/user/diy`，登录普通用户后手动检查：
+  - 花材架真实 WebP 缩略图是否显示
+  - 模板是否能载入花束
+  - 拖拽、束口吸附、旋转缩放、复制删除、层级调整是否正常
+  - 保存后是否能进入方案详情并还原
+  - 移动端横向花材挑选体验是否正常
+- 如果用户认可效果，可考虑后续整理：
+  - 将 `DiyPageMigrated.vue` 重命名回 `DiyPage.vue`
+  - 将 `DiyPlanDetailMigrated.vue` 重命名回 `DiyPlanDetail.vue`
+  - 删除旧 SVG 逻辑组件，减少长期维护成本
+- 当前后端种子数据没有“满天星”，但 `baby-breath.webp` 已放入图片目录；后续若补后端花材，可接入满天星。
+
 ## 2026-07-05（DIY 正式 Vue 功能迁移）
 
 ### 已完成
