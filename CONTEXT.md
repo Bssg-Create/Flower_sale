@@ -1,5 +1,31 @@
 # 项目上下文记录
 
+## 2026-07-05（DIY 正式 Vue 功能迁移）
+
+### 已完成
+- 用户确认可以开始正式迁移，并指出项目图片源目录应使用 `imags`；因此本轮没有把素材放入 `flower-frontend/src/assets`。
+- 已将预览页轻量透明 WebP 素材同步到：
+  - `imags/diy/`
+  - `flower-web/src/main/resources/static/images/diy/`
+- 正式前端新增共享真实花束画布组件：`flower-frontend/src/components/BouquetCanvas.vue`。
+  - 支持真实 WebP 花材、多层包装纸、纸张纹理、花茎束、束口吸附、拖拽摆放、旋转、缩放、复制、删除、层级调整、祝福卡片。
+  - 坐标使用预览页的 560x600 逻辑画布，渲染时按百分比适配桌面和移动端。
+- 新增正式迁移版页面：
+  - `flower-frontend/src/components/DiyPageMigrated.vue`
+  - `flower-frontend/src/components/DiyPlanDetailMigrated.vue`
+- 已更新 `flower-frontend/src/router/index.js`，让 `/user/diy` 和 `/user/plan/:id` 指向迁移版组件。
+- 保留原有 `/diy/flowers`、`/diy/package/list`、`/diy/save`、`/diy/{id}/order` 接口逻辑，不改 Java 后端。
+- `position` JSON 继续保存兼容字段 `x/y/rotation/scale`，新增 `z/bend/tilt/photoWidth/photoHeight/message` 等前端增强字段；详情页读取旧方案时会自动兜底。
+
+### 自测
+- `flower-frontend` 下执行 `npm run build` 已通过。
+- 构建期提示 `/images/diy/wrapping-paper-texture.webp` 不会被 Vite 打包、会在运行时解析；这是预期行为，因为图片由后端静态目录 `flower-web/src/main/resources/static/images/diy/` 提供。
+
+### 注意事项
+- 本轮为了避免 `apply_patch` 删除旧大文件不稳定，未直接覆盖旧 `DiyPage.vue` / `DiyPlanDetail.vue`，而是新增迁移版组件并通过路由切换正式入口。
+- 当前后端种子数据没有“满天星”花材，正式模板暂时使用后端已有花材完成搭配；`baby-breath.webp` 已放入图片目录，后续如果后端补花材即可接入。
+- 后续如需进一步整理，可在确认稳定后把迁移版组件重命名回原组件名，并删除旧 SVG 逻辑组件。
+
 ## 2026-07-05（新对话接力：准备正式迁移）
 
 ### 当前状态
