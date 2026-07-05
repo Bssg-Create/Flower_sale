@@ -80,7 +80,17 @@ Strong success criteria let you loop independently\. Weak criteria \("make it wo
 
 ## 5\. Git Commit \& Push Discipline
 
-Immediately perform `git add` → `git commit` → `git push` after every code modification, feature addition, or code adjustment\. Push all changes to the remote repository: `https://github.com/Bssg-Create/Flower.git` at all times to ensure full rollback availability\.
+After every completed code modification, feature addition, bug fix, or code adjustment, perform `git add` → `git commit` → `git push` to preserve rollback availability.
+
+Before performing the first Git push for a project, ask the user to provide or confirm:
+
+- The remote repository URL.
+- The target branch name.
+- Whether the current local project should be connected to that repository.
+
+Do not assume, hardcode, reuse, or automatically select a repository URL from another project or previous conversation. Do not change the existing Git remote or push any changes until the user has explicitly confirmed the repository and target branch.
+
+Once the repository and branch have been confirmed for the current project, continue using them for subsequent Git operations unless the user provides different instructions.
 
 ## 6\. Solution\-First Approval
 
@@ -110,5 +120,9 @@ After reading data or obtaining output from function/API calls, commands, or pro
 ## 11. Strict Git Privacy Protection
 
 Avoid committing or pushing any private and sensitive information during all Git operations. Never submit API keys, account passwords, tokens, private credentials, database secrets or any other confidential project and personal data to the Git repository. Always perform full data desensitization to ensure project security and eliminate the risk of information leakage.
+
+## 12. Temporary Test File Cleanup
+
+Any test files, sample data, generated artifacts, logs, temporary scripts, build outputs, or other files created solely for the current test and no longer needed afterward must be deleted immediately after testing is complete. Before deletion, ensure that the files are not required for normal project operation, future development, or user data retention.
 
 These guidelines are working if: fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.

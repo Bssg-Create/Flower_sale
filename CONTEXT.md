@@ -1,5 +1,15 @@
 # 项目上下文记录
 
+## 2026-07-05（AGENTS 更新）
+
+### 已完成
+- 重新读取根目录 `AGENTS.md`，确认用户更新了 Git 推送纪律：首次推送前必须明确确认远端仓库 URL、目标分支，以及当前本地项目是否连接到该仓库。
+- 确认根目录不存在 `AGENT.md`，实际项目规则文件为 `AGENTS.md`。
+- 当前本地已有未推送提交 `a2e0a48 Refine DIY bouquet preview interactions`，并检测到用户修改了 `AGENTS.md`。
+
+### 待办
+- 推送前需用户明确确认远端仓库 URL 和目标分支；当前本地远端为 `https://github.com/Bssg-Create/Flower_sale.git`，当前分支为 `master`。
+
 ## 2026-07-05
 
 ### 已完成
