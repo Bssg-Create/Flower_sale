@@ -78,6 +78,8 @@ const flowerProfiles = [
   { key: '红玫瑰', asset: 'red-rose.webp', photoWidth: 126, photoHeight: 226 },
   { key: '白玫瑰', asset: 'white-rose.webp', photoWidth: 126, photoHeight: 226 },
   { key: '粉玫瑰', asset: 'pink-rose.webp', photoWidth: 126, photoHeight: 226 },
+  { key: '黄玫瑰', asset: 'yellow-rose.webp', photoWidth: 128, photoHeight: 236 },
+  { key: '红郁金香', asset: 'red-tulip.webp', photoWidth: 118, photoHeight: 236 },
   { key: '粉郁金香', asset: 'pink-tulip.webp', photoWidth: 120, photoHeight: 226 },
   { key: '黄郁金香', asset: 'yellow-tulip.webp', photoWidth: 122, photoHeight: 236 },
   { key: '白百合', asset: 'white-lily.webp', photoWidth: 132, photoHeight: 228 },

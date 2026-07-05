@@ -112,6 +112,8 @@ const assetByName = [
   ['红玫瑰', 'red-rose.webp'],
   ['白玫瑰', 'white-rose.webp'],
   ['粉玫瑰', 'pink-rose.webp'],
+  ['黄玫瑰', 'yellow-rose.webp'],
+  ['红郁金香', 'red-tulip.webp'],
   ['粉郁金香', 'pink-tulip.webp'],
   ['黄郁金香', 'yellow-tulip.webp'],
   ['白百合', 'white-lily.webp'],

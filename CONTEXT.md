@@ -1,5 +1,37 @@
 # 项目上下文记录
 
+## 2026-07-05（DIY 正式页面贴近 preview 风格并补花材）
+
+### 已完成
+- 用户确认正式 DIY 页面可以继续按 `docs/diy-preview.html` 的真实花束定制方向推进，同时保留花卉销售系统现有顶部导航和业务流程，避免整体突兀。
+- 使用内置图片生成工具生成两张本地花材源图，并用本地 `remove_chroma_key.py` 去背景输出透明 WebP：
+  - `imags/diy/yellow-rose.webp`
+  - `imags/diy/red-tulip.webp`
+- 已同步两张新素材到后端静态资源源码目录：
+  - `flower-web/src/main/resources/static/images/diy/yellow-rose.webp`
+  - `flower-web/src/main/resources/static/images/diy/red-tulip.webp`
+- 为当前已运行的 8081 后端实例，同步两张新素材到 `flower-web/target/classes/static/images/diy/`；该目录不作为源码提交，只用于当前运行态立即可见。
+- 已在正式 Vue 组件中补齐花名到本地素材映射：
+  - `DiyPageMigrated.vue`：补 `黄玫瑰`、`红郁金香` 的 `flowerProfiles`。
+  - `DiyPlanDetailMigrated.vue`：补详情页还原映射。
+  - `BouquetCanvas.vue`：补共享画布兜底映射。
+- `DiyPageMigrated.vue` 内容区样式已进一步贴近 `diy-preview.html`：暖纸面背景、细边框、轻纸纹、红绿花艺点缀、模板卡/花材卡/右侧清单的预览页质感；顶部系统导航未改。
+
+### 自测
+- `flower-frontend` 下执行 `npm run build` 已通过。
+- 由于沙箱内 esbuild 子进程报 `spawn EPERM`，构建在提升权限后执行成功。
+- 已验证后端静态资源：
+  - `http://127.0.0.1:8081/images/diy/yellow-rose.webp` 返回 `200` 和 `content-type: image/webp`。
+  - `http://127.0.0.1:8081/images/diy/red-tulip.webp` 返回 `200` 和 `content-type: image/webp`。
+- 已验证前端开发代理：
+  - `http://127.0.0.1:5173/images/diy/yellow-rose.webp` 返回 `200 OK` 和 `content-type: image/webp`。
+  - `http://127.0.0.1:5173/images/diy/red-tulip.webp` 返回 `200 OK` 和 `content-type: image/webp`。
+- 后端 `/api/diy/flowers` 数据确认包含 `黄玫瑰` 和 `红郁金香`，新映射会命中。
+
+### 下一步
+- 用户刷新 `http://127.0.0.1:5173/#/user/diy` 后检查正式页面视觉是否已足够接近 `diy-preview.html`。
+- 如视觉认可，后续可继续做截图级验证：拖拽、束口吸附、保存、详情页还原和移动端横向花材挑选。
+
 ## 2026-07-05（修复 DIY 图片开发代理）
 
 ### 已完成
