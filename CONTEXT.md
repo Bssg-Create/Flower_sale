@@ -1,5 +1,42 @@
 # 项目上下文记录
 
+## 2026-07-05（新对话接力：准备正式迁移）
+
+### 当前状态
+- 用户准备重开新对话，需要新对话继续围绕花卉销售系统 DIY 花束功能推进。
+- 独立预览页 `docs/diy-preview.html` 已基本完成并推送，当前最新提交为 `91e22d8 Improve DIY preview assets and mobile interactions`。
+- 预览页仍是效果稿，不接入后端；正式 Vue/Java 业务代码尚未迁移。
+- 已确认当前 Git 远端和目标分支：`https://github.com/Bssg-Create/Flower_sale.git`，`master`。
+
+### 已完成
+- `docs/diy-preview.html` 已包含：真实感 WebP 花材、花材架、包装切换、纸张纹理、多层包装纸、花束工作台、拖拽摆放、束口吸附、旋转缩放、复制删除、花艺灵感模板、祝福卡片、价格汇总、移动端横向挑选体验。
+- 已新增/使用本地透明 WebP 花材素材：红玫瑰、白玫瑰、粉玫瑰、粉郁金香、黄郁金香、白百合、粉百合、向日葵、康乃馨、小雏菊、满天星、尤加利叶、包装纸纹理。
+- 最近一轮补齐了黄郁金香和粉百合独立透明 WebP：`docs/assets/diy/yellow-tulip.webp`、`docs/assets/diy/pink-lily.webp`，不再复用旧图加滤镜。
+- 已阅读正式组件现状：
+  - `flower-frontend/src/components/DiyPage.vue` 当前已接 `/diy/flowers`、`/diy/package/list`、`/diy/save`，保存 `position` JSON，但画布仍使用 SVG 花型和简单包装形状。
+  - `flower-frontend/src/components/DiyPlanDetail.vue` 当前读取详情接口，解析 `position` 回显，但也重复使用 SVG 花型逻辑。
+  - 项目整体风格来自 `UserLayout.vue` / `DiyPlanList.vue`：粉色渐变 `#ff6b9d -> #c44569`、白色卡片、15-20px 圆角、轻阴影、清爽可爱。
+  - `flower-frontend/package.json` 已有 Vue/Vite/Axios/Element Plus，不需要新增依赖。
+
+### 用户最新意图
+- 用户问“可以迁移了吗”，并明确希望“完整迁移”，且要适配原项目整体风格。
+- 已给出迁移计划，但尚未执行正式代码改动。
+- 下一次对话应先重读 `CONTEXT.md` 和 `AGENTS.md`，然后基于计划继续；如果要改正式功能，仍需先给完整方案并等待用户确认。
+
+### 建议迁移计划
+1. 新增共享 `BouquetCanvas.vue`，让 `DiyPage.vue` 和 `DiyPlanDetail.vue` 共用真实花束画布；支持编辑模式和只读预览模式。
+2. 把 `docs/assets/diy/*.webp` 复制/迁移到前端静态资源目录，建议 `flower-frontend/src/assets/diy/`，并建立花名到本地素材的映射；后端 `imageUrl` 可用时优先用后端图，本地素材兜底。
+3. 改造 `DiyPage.vue`：保留现有接口、保存、下单逻辑；迁移真实花材、包装纸层、束口吸附、拖拽、旋转缩放、复制删除、层级、价格汇总和移动端体验。
+4. 扩展但兼容 `position` JSON：继续保存 `x/y/rotation/scale`，新增 `z` 等字段；旧方案缺少新字段时自动兜底，不改 Java 后端。
+5. 改造 `DiyPlanDetail.vue`：使用同一画布组件只读回显，避免继续维护重复 SVG 逻辑。
+6. 花艺灵感模板、祝福卡片等增强能力可以完整迁移，但建议放在核心保存/回显稳定之后再接入，避免影响主流程。
+7. 自测标准：`npm run build` 通过；新建 DIY 方案、拖拽、旋转缩放、保存、详情页还原、旧方案回显、移动端布局均正常；完成后更新 `CONTEXT.md`、提交并推送。
+
+### 注意事项
+- 不要安装新依赖；如果确实需要，必须先说明用途和预计大小并获得许可。
+- 不要直接使用网上图片；继续使用本地生成/透明 WebP 素材。
+- 按 `AGENTS.md`：正式修改前先说明完整方案，得到用户确认后执行；完成后自测、更新 `CONTEXT.md`、提交并推送。
+
 ## 2026-07-05（DIY 预览继续优化）
 
 ### 已完成
