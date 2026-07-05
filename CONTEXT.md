@@ -33,29 +33,31 @@
 - 如果确认继续，再将效果拆分为 Vue 组件，并复用到 `DiyPage.vue` 和 `DiyPlanDetail.vue`。
 - 正式改造时需注意：尽量不引入新依赖；如需真实花材图片，应优先准备透明背景素材或生成轻量 WebP/PNG 资源。
 
-## 新对话接力说明（2026-07-01）
+## 新对话接力说明（2026-07-05）
 
 ### 当前要做什么
 - 用户准备重开一份新对话，需要新对话快速知道当前进度。
 - 当前核心任务仍是：围绕花卉销售系统的 DIY 花束功能做视觉和交互优化。
-- 用户暂时只想先看 `docs/diy-preview.html` 的效果，不希望在确认前直接改正式 Vue/Java 业务功能。
+- 用户暂时只想先继续打磨 `docs/diy-preview.html` 的独立效果稿，不希望在确认前直接改正式 Vue/Java 业务功能。
 
 ### 现在做到哪一步了
 - 已经新增独立静态预览页：`docs/diy-preview.html`。
 - 预览页包含：花材架、真实感花材素材、包装切换、真实纸张纹理、花束工作台、拖拽摆放、束口吸附、旋转缩放、复制删除、花艺灵感模板、花语场景标签、祝福卡片、多层包装纸、满天星填充和价格汇总。
+- 2026-07-03 已根据用户反馈修正素材复用问题：粉玫瑰、康乃馨、小雏菊分别改用独立透明 WebP 素材，避免粉玫瑰和康乃馨长得一样，小雏菊也不再使用 CSS 花型模拟。
 - 预览页已提交并推送：
-  - commit：`7a413cb Add DIY bouquet preview page`
+  - 最新 commit：`57313f9 Add distinct realistic DIY flower assets`
   - 分支：`master`
   - 远端：`origin`
 - 正式业务代码尚未迁移改造。
 
 ### 下一步怎么推进
 1. 用户先打开 `D:\GProject\flower_trae\flower-sales\docs\diy-preview.html` 看效果。
-2. 如果用户认可方向，再把效果迁移到正式 Vue 组件：
+2. 如果继续打磨预览页，优先检查花束构图、花材层级遮挡、包装束口真实感、移动端比例，以及剩余仍靠滤镜模拟的黄色郁金香/粉百合是否需要独立素材。
+3. 如果用户认可方向，再把效果迁移到正式 Vue 组件：
    - `flower-frontend/src/components/DiyPage.vue`
    - `flower-frontend/src/components/DiyPlanDetail.vue`
-3. 建议迁移时优先提取一个复用画布组件，例如 `BouquetCanvas.vue`。
-4. 后端可以暂时不改，继续使用当前 `position` JSON 保存 `x/y/rotation/scale`。
+4. 建议迁移时优先提取一个复用画布组件，例如 `BouquetCanvas.vue`。
+5. 后端可以暂时不改，继续使用当前 `position` JSON 保存 `x/y/rotation/scale`。
 
 ### 注意事项
 - 用户已明确允许提交 `AGENTS.md`。
@@ -77,8 +79,9 @@
 - 用户觉得现有 DIY 页面样式别扭，不像真实挑花、选包装、自己摆放。
 - 已经新增了一个独立 HTML 预览页：docs/diy-preview.html。
 - 这个预览页只是效果稿，不接入后端，也没有改正式 Vue/Java 业务功能。
-- 预览页包含花材架、包装切换、花束工作台、拖拽摆放、旋转缩放、复制删除、示例花束和价格汇总。
-- 预览页已提交并推送，commit 是 7a413cb Add DIY bouquet preview page。
+- 预览页包含花材架、真实感 WebP 花材、包装切换、真实纸张纹理、花束工作台、拖拽摆放、束口吸附、旋转缩放、复制删除、花艺灵感模板、祝福卡片和价格汇总。
+- 最新一轮已修复粉玫瑰和康乃馨复用同一张红玫瑰素材的问题，并给小雏菊新增真实感透明 WebP 素材。
+- 预览页已提交并推送，最新 commit 是 57313f9 Add distinct realistic DIY flower assets。
 
 现在请先不要直接改正式功能。请先帮我基于 docs/diy-preview.html 继续讨论或调整预览效果。等我明确确认后，再把效果迁移到正式 Vue 组件 DiyPage.vue 和 DiyPlanDetail.vue。
 
@@ -88,4 +91,5 @@
 - AGENTS.md 可以提交。
 - 如果修改文件，结束前更新 CONTEXT.md。
 - 如果正式改代码，完成后自测、提交并推送。
+- 如果继续生成或替换花材素材，优先使用本地生成/透明 WebP，不要直接使用网上图片。
 ```
