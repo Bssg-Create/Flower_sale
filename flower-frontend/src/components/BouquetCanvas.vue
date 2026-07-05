@@ -176,10 +176,13 @@ const snapToBouquetMouth = (point) => {
   const dx = stemBase.x - mouth.x
   const dy = stemBase.y - mouth.y
   const distance = Math.hypot(dx, dy)
-  if (distance > 112) return { ...point, snapped: false }
+  const snapRadius = 112
+  if (distance > snapRadius) return { ...point, snapped: false }
+  const strength = Math.max(0, 1 - distance / snapRadius)
+  const pull = strength * strength
   return {
-    x: Math.round(point.x - dx * 0.5),
-    y: Math.round(point.y - dy * 0.58),
+    x: Math.round(point.x - clamp(dx * pull * 0.36, -18, 18)),
+    y: Math.round(point.y - clamp(dy * pull * 0.42, -16, 16)),
     snapped: true
   }
 }
