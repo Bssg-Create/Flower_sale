@@ -1,5 +1,22 @@
 # 项目上下文记录
 
+## 2026-07-05（修复 DIY 图片开发代理）
+
+### 已完成
+- 用户在 `http://127.0.0.1:5173/#/user/diy` 页面反馈花材图片显示不出来，页面只显示破图图标和花名。
+- 排查结论：数据库不是主要问题，因为花名和价格已正常显示，说明 `/api/diy/flowers` 数据已返回；问题在于前端开发服务只代理了 `/api`，没有代理 `/images`。
+- `DiyPageMigrated.vue` / `BouquetCanvas.vue` 会使用 `/images/diy/*.webp` 访问本地真实花材素材；在开发环境中浏览器会请求 `http://127.0.0.1:5173/images/diy/*.webp`，但真实静态资源由后端 `8081` 提供。
+- 已修改 `flower-frontend/vite.config.js`，新增 `/images` 代理到 `http://localhost:8081`，不改数据库、不新增依赖、不移动图片。
+
+### 自测
+- `flower-frontend` 下执行 `npm run build` 已通过。
+- 临时启动 `http://127.0.0.1:5174/` 验证新代理，`curl.exe -I http://127.0.0.1:5174/images/diy/red-rose.webp` 返回 `HTTP/1.1 200 OK`、`content-type: image/webp`、`content-length: 45554`。
+- 临时 5174 Vite 验证服务已停止。
+
+### 下一步
+- 用户当前 5173 前端开发服务需要重启后才会读取新的 Vite 代理配置。
+- 重启后重新打开 `http://127.0.0.1:5173/#/user/diy`，花材架缩略图和画布花材应能正常显示。
+
 ## 2026-07-05（重开对话前：IDEA MCP 启动验证）
 
 ### 当前最新状态
