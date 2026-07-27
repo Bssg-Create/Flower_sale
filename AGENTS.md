@@ -125,4 +125,22 @@ Avoid committing or pushing any private and sensitive information during all Git
 
 Any test files, sample data, generated artifacts, logs, temporary scripts, build outputs, or other files created solely for the current test and no longer needed afterward must be deleted immediately after testing is complete. Before deletion, ensure that the files are not required for normal project operation, future development, or user data retention.
 
+
+## 13. New Conversation Handoff Command
+
+When the user sends the exact instruction `开启新对话`, treat it as a command to prepare a complete handoff for a new conversation.
+
+Before responding to that instruction:
+
+1. Update the root `CONTEXT.md` file with the latest project status, completed work, important decisions, current configuration, relevant file paths, unresolved issues, and clear next steps.
+2. Ensure that all information required to continue the project in a new conversation is preserved, and remove or correct any outdated context when necessary.
+3. After updating `CONTEXT.md`, provide the user with a complete, ready-to-copy prompt for starting the new conversation. The prompt must summarize the project background, current progress, confirmed requirements, important constraints, and the exact next task to continue.
+4. Do not provide only a conversational summary. The `CONTEXT.md` file must be updated first, and the new-conversation prompt must be provided afterward.
+5. Unless the user explicitly requests another language, write the new-conversation prompt in the same language currently used by the user.
+
+
+## 14. Local Availability Check Before Downloads
+
+Before downloading any dependency, driver, tool, runtime, package, model, installer, or other external resource, first check whether a suitable version already exists on the local machine. Reuse an existing local resource whenever possible. If the required resource is not available locally, clearly explain what is missing, why it is needed, its expected source, and its estimated download size, then ask the user whether to proceed with the download. Do not download anything without the user's explicit approval.
+
 These guidelines are working if: fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
