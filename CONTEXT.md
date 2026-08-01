@@ -8,8 +8,9 @@
 - 当前登录、注册、用户首页、导航、DIY 方案页、管理后台、AI 助手和全局样式均恢复为 `43aef51` 时的代码与外观；`git diff --quiet 43aef51 -- flower-frontend` 验证完全一致。
 - 回退采用 Git revert 方式保留历史，没有使用强制重置，也没有覆盖其他未提交修改。
 - 回退后的 `npm run build` 已通过：Vite 转换 102 个模块，CSS 约 40.21 kB、JS 约 195.58 kB；仅有 Vite CJS API 弃用和包装纸纹理运行时解析提示。
-- 已启动 Vite 并用本机 Chrome 截图确认旧版登录页真实显示为居中白色卡片、粉色按钮和花朵图标；随后已停止 Vite并删除截图及 `dist`，无临时测试文件残留。
+- 已启动 Vite 并用本机 Chrome 截图确认旧版登录页真实显示为居中白色卡片、粉色按钮和花朵图标；随后已停止 Vite 并删除截图及 `dist`，无临时测试文件残留。
 - 用户已在当前对话中明确授权：将本地项目连接并推送到 `https://github.com/Bssg-Create/Flower_sale.git` 的 `master` 分支；推送完成后开启新对话。
+- 回退提交与新对话交接记录已经成功推送到 `origin/master`；远端当前前端代码为恢复后的旧版外观。
 
 ### 已确认的产品需求
 - 项目用于毕业设计，技术栈为 Vue 3 + Vite + Spring Boot + MyBatis-Plus + MySQL；角色只有普通用户和管理员。
