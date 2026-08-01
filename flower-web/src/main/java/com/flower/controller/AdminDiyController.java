@@ -1,11 +1,13 @@
 package com.flower.controller;
 
 import com.flower.base.ResponseResult;
+import com.flower.config.AuthContext;
 import com.flower.entity.DiyBouquet;
 import com.flower.entity.User;
 import com.flower.service.DiyBouquetService;
 import com.flower.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -27,7 +29,8 @@ public class AdminDiyController {
     }
 
     @GetMapping("/list")
-    public ResponseResult<List<Map<String, Object>>> list() {
+    public ResponseResult<List<Map<String, Object>>> list(HttpServletRequest request) {
+        AuthContext.requireAdmin(request);
         try {
             List<DiyBouquet> bouquets = diyBouquetService.listAllBouquets();
             List<User> users = userService.listAll();
@@ -58,7 +61,9 @@ public class AdminDiyController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseResult<Boolean> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> params) {
+    public ResponseResult<Boolean> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> params,
+                                                HttpServletRequest request) {
+        AuthContext.requireAdmin(request);
         try {
             DiyBouquet bouquet = diyBouquetService.getBouquetById(id);
             if (bouquet == null) {

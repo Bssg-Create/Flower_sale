@@ -59,9 +59,10 @@ public class UserServiceImpl implements UserService {
         }
         User user = new User();
         BeanUtils.copyProperties(userDto, user);
+        user.setId(null);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setStatus("1");
-        user.setUserType(userDto.getUserType() != null ? userDto.getUserType() : "user");
+        user.setUserType("user");
         userMapper.insert(user);
         return user;
     }

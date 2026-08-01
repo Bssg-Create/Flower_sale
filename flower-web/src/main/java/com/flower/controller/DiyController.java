@@ -1,17 +1,20 @@
 package com.flower.controller;
 
 import com.flower.base.ResponseResult;
+import com.flower.config.AuthContext;
 import com.flower.entity.DiyBouquet;
 import com.flower.entity.DiyBouquetItem;
 import com.flower.entity.Flower;
 import com.flower.entity.Order;
 import com.flower.entity.OrderItem;
 import com.flower.entity.PackageType;
+import com.flower.exception.BaseException;
 import com.flower.service.DiyBouquetService;
 import com.flower.service.FlowerService;
 import com.flower.service.OrderService;
 import com.flower.service.PackageTypeService;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -39,8 +42,8 @@ public class DiyController {
     }
 
     @PostMapping("/save")
-    public ResponseResult<DiyBouquet> save(@RequestBody Map<String, Object> params) {
-        Long userId = Long.valueOf(params.get("userId").toString());
+    public ResponseResult<DiyBouquet> save(@RequestBody Map<String, Object> params, HttpServletRequest request) {
+        Long userId = AuthContext.getUserId(request);
         String name = (String) params.get("name");
         String packageType = (String) params.get("packageType");
         BigDecimal totalPrice = new BigDecimal(params.get("totalPrice").toString());
@@ -72,12 +75,20 @@ public class DiyController {
     }
 
     @GetMapping("/list")
-    public ResponseResult<List<DiyBouquet>> list(@RequestParam Long userId) {
+    public ResponseResult<List<DiyBouquet>> list(@RequestParam(required = false) Long userId,
+                                                 HttpServletRequest request) {
         try {
+            if (AuthContext.isAdmin(request) && userId == null) {
+                return ResponseResult.success(diyBouquetService.listAllBouquets());
+            }
+            Long requestedUserId = userId != null ? userId : AuthContext.getUserId(request);
+            AuthContext.requireOwnerOrAdmin(request, requestedUserId);
             log.info("DiyController.list called with userId={}", userId);
-            List<DiyBouquet> result = diyBouquetService.listBouquetsByUser(userId);
+            List<DiyBouquet> result = diyBouquetService.listBouquetsByUser(requestedUserId);
             log.info("DiyController.list result size={}", result != null ? result.size() : 0);
             return ResponseResult.success(result);
+        } catch (BaseException e) {
+            throw e;
         } catch (Exception e) {
             log.error("DiyController.list error", e);
             return ResponseResult.error(e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -85,8 +96,8 @@ public class DiyController {
     }
 
     @GetMapping("/{id}")
-    public ResponseResult<Map<String, Object>> detail(@PathVariable Long id) {
-        DiyBouquet bouquet = diyBouquetService.getBouquetById(id);
+    public ResponseResult<Map<String, Object>> detail(@PathVariable Long id, HttpServletRequest request) {
+        DiyBouquet bouquet = getAuthorizedBouquet(id, request);
         List<DiyBouquetItem> items = diyBouquetService.getBouquetItems(id);
         Map<String, Object> result = new HashMap<>();
         result.put("bouquet", bouquet);
@@ -95,13 +106,20 @@ public class DiyController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseResult<Boolean> delete(@PathVariable Long id) {
+    public ResponseResult<Boolean> delete(@PathVariable Long id, HttpServletRequest request) {
+        getAuthorizedBouquet(id, request);
         return ResponseResult.success(diyBouquetService.deleteBouquet(id));
     }
 
     @PostMapping("/{id}/order")
-    public ResponseResult<Order> placeOrder(@PathVariable Long id, @RequestBody Map<String, Object> params) {
-        Long userId = Long.valueOf(params.get("userId").toString());
+    public ResponseResult<Order> placeOrder(@PathVariable Long id, @RequestBody Map<String, Object> params,
+                                            HttpServletRequest request) {
+        DiyBouquet bouquet = diyBouquetService.getBouquetById(id);
+        if (bouquet == null) {
+            throw new BaseException(404, "花束方案不存在");
+        }
+        AuthContext.requireOwner(request, bouquet.getUserId());
+        Long userId = AuthContext.getUserId(request);
         String shippingAddress = (String) params.get("shippingAddress");
         String receiverName = (String) params.get("receiverName");
         String receiverPhone = (String) params.get("receiverPhone");
@@ -116,11 +134,8 @@ public class DiyController {
 
         Order order = orderService.createOrder(userId, orderItems, shippingAddress, receiverName, receiverPhone);
 
-        DiyBouquet bouquet = diyBouquetService.getBouquetById(id);
-        if (bouquet != null) {
-            bouquet.setStatus("ordered");
-            diyBouquetService.updateBouquet(bouquet);
-        }
+        bouquet.setStatus("ordered");
+        diyBouquetService.updateBouquet(bouquet);
 
         return ResponseResult.success(order);
     }
@@ -137,5 +152,14 @@ public class DiyController {
     @GetMapping("/package/list")
     public ResponseResult<List<PackageType>> packages() {
         return ResponseResult.success(packageTypeService.listAll());
+    }
+
+    private DiyBouquet getAuthorizedBouquet(Long id, HttpServletRequest request) {
+        DiyBouquet bouquet = diyBouquetService.getBouquetById(id);
+        if (bouquet == null) {
+            throw new BaseException(404, "花束方案不存在");
+        }
+        AuthContext.requireOwnerOrAdmin(request, bouquet.getUserId());
+        return bouquet;
     }
 }
