@@ -1,5 +1,42 @@
 # 项目上下文记录
 
+## 2026-08-01（开启新对话：IDEA 一键启动配置完成交接）
+
+### 当前准确状态
+- 项目路径：`D:\GProject\flower_trae\flower-sales`。
+- Git 分支：`master`；远端：`https://github.com/Bssg-Create/Flower_sale.git`。
+- IDEA 一键启动功能提交为：`0de3f5a Add IDEA full-stack development setup`，已推送到 `origin/master`；写入本交接记录前工作区干净并与远端同步。
+- IDEA MCP 当前仍能识别以下共享配置：
+  - `Flower Backend - Dev`
+  - `Flower Frontend - Dev`
+  - `Flower Full Stack - Dev`
+- 8081、5173、5174 当前均无监听，上一轮验证产生的后端、Vite、隔离 Chrome、临时脚本和临时浏览器目录均已清理。
+- 项目外保留一张最终桌面端验证截图用于本轮交付，未纳入 Git。
+
+### 已完成并验证
+- 三个正常开发所需配置保存在项目共享 `.run` 目录，原有两个临时同名 `FlowerApplication` 配置未删除或覆盖。
+- `Flower Backend - Dev` 使用 `flower-web` 模块和 `com.flower.FlowerApplication`，工作目录为项目根目录。
+- `Flower Frontend - Dev` 使用现有本地 Node `v20.20.2`、npm `10.8.2` 和已有 `node_modules`，执行 `npm run dev -- --host 127.0.0.1 --open`。
+- `Flower Full Stack - Dev` 是 Compound 配置，可同时启动上述前后端配置；已通过 IDEA MCP 从端口空闲状态实际执行验证。
+- IDEA MCP 对 Compound 本身会返回 `Execution failed: The process has failed to start.`，但这是无法取得 Compound 单一进程句柄时的误报；实际两个子配置均成功启动，端口、JVM 主类、HTTP 和页面均已独立核实。
+- `8081` 后端首页和 `/api/diy/flowers` 接口返回 HTTP `200`，接口业务码为 `code:200`。
+- `5173` 返回 HTTP `200`，HTML 包含 `/@vite/client` 和 `/src/main.js`，说明加载当前 Vue 源码而非后端旧 static。
+- `http://127.0.0.1:5173/#/user/diy` 实际显示 `DiyPageMigrated.vue` 的 `DIY BOUQUET` 迁移版，包含花材架、花艺模板、花束工作台和花材清单。
+- 本轮没有安装或下载资源，没有修改业务源码、数据库、`flower-frontend/dist`、后端 static 或 DIY 功能。
+
+### 日常使用结论
+- IDEA 中选择 `Flower Full Stack - Dev` 启动，开发时访问 `http://127.0.0.1:5173/`。
+- `5173` 负责实时 Vue 源码和热更新；`8081` 只提供 API 与 `/images`。
+- 毕业答辩前再构建前端并同步 `dist`，以单端口 `8081` 演示；当前不要执行该步骤。
+
+### 新对话的精确下一步
+1. 完整阅读根目录 `AGENTS.md`、`CONTEXT.md` 和 `IDEA启动与前端同步使用方案.md`，确认 Git 工作区与 `master` 同步状态。
+2. 不再重复创建或诊断 IDEA 一键启动配置；如需开发运行，直接使用 `Flower Full Stack - Dev`。
+3. 下一项推荐任务是先提交一份最小、适合毕业设计的“后端权限与数据一致性修复方案”，只讨论方案、不修改代码，等待用户明确确认。
+4. 方案应按以下顺序覆盖：角色和资源所属权限、敏感数据脱敏、Bean Validation、订单与 DIY 服务端校验、状态值统一、普通用户订单闭环、管理后台缺口。
+5. 不要重新做全站视觉重构，不要删除或削弱 DIY 花束功能；AI 助手仍是低优先级可选加分项，支付继续使用模拟支付。
+6. 任何安装或下载前先检查本地资源并获得许可；正式修改前先给完整方案，获批后最小改动、自测、更新 `CONTEXT.md`、检查敏感信息并提交推送。
+
 ## 2026-08-01（IDEA 一键启动配置创建与实测完成）
 
 ### 已完成
