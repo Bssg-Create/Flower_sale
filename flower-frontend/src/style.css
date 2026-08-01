@@ -1,15 +1,79 @@
+:root {
+  font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+  color: #222a25;
+  background: #f3f5f0;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  --color-bg: #f3f5f0;
+  --color-surface: #fffdfa;
+  --color-surface-strong: #ffffff;
+  --color-ink: #222a25;
+  --color-muted: #66706a;
+  --color-line: #dbe2da;
+  --color-primary: #9d4155;
+  --color-primary-dark: #7d3043;
+  --color-primary-soft: #f4e5e8;
+  --color-leaf: #365f4b;
+  --color-leaf-dark: #294b3b;
+  --color-leaf-soft: #e4eee8;
+  --color-danger: #ad3448;
+  --color-warning: #8b631e;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-feature: 16px;
+  --shadow-card: 0 10px 30px rgba(40, 63, 49, 0.08);
+  --shadow-lift: 0 14px 38px rgba(40, 63, 49, 0.13);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  background: var(--color-bg);
+}
+
 body {
-  font-family: 'Microsoft YaHei', sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+  min-width: 320px;
   min-height: 100vh;
+  color: var(--color-ink);
+  background: var(--color-bg);
+  line-height: 1.5;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(54, 95, 75, 0.22);
+  outline-offset: 2px;
+}
+
+img {
+  max-width: 100%;
 }
 
 #app {
   min-height: 100vh;
+}
+
+::selection {
+  color: var(--color-surface-strong);
+  background: var(--color-primary);
 }

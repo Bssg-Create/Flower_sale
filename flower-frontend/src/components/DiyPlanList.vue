@@ -1,7 +1,11 @@
 <template>
   <div class="plan-list-page">
     <div class="page-header">
-      <h2>💐 我的DIY花束方案</h2>
+      <div>
+        <p class="eyebrow">已保存的花礼设计</p>
+        <h2>我的 DIY 花束方案</h2>
+        <p class="page-desc">查看、恢复或继续下单你的定制花束。</p>
+      </div>
       <router-link to="/user/diy" class="create-btn">+ 创建新方案</router-link>
     </div>
 
@@ -11,18 +15,28 @@
       <router-link to="/user/diy" class="go-diy-btn">去设计花束</router-link>
     </div>
     <div class="plan-grid" v-else>
-      <div v-for="plan in plans" :key="plan.id" class="plan-card" @click="viewPlan(plan.id)">
-        <div class="plan-icon">💐</div>
-        <h3>{{ plan.name }}</h3>
-        <p class="plan-pkg">包装: {{ plan.packageType || '无' }}</p>
-        <p class="plan-price">¥{{ plan.totalPrice.toFixed(2) }}</p>
-        <p class="plan-status" :class="plan.status">{{ statusText(plan.status) }}</p>
-        <p class="plan-time">{{ formatTime(plan.createTime) }}</p>
-        <div class="plan-actions" @click.stop>
-          <button class="btn-preview" @click="viewPlan(plan.id)">预览</button>
-          <button class="btn-delete" @click="deletePlan(plan.id)">删除</button>
+      <article v-for="(plan, index) in plans" :key="plan.id" class="plan-card" @click="viewPlan(plan.id)">
+        <div class="plan-preview" aria-hidden="true">
+          <img :src="previewImage(previewFlowers[index % previewFlowers.length][0])" alt="" />
+          <img :src="previewImage(previewFlowers[index % previewFlowers.length][1])" alt="" />
+          <img :src="previewImage('eucalyptus.webp')" alt="" />
         </div>
-      </div>
+        <div class="plan-body">
+          <div class="plan-title-row">
+            <h3>{{ plan.name }}</h3>
+            <p class="plan-status" :class="plan.status">{{ statusText(plan.status) }}</p>
+          </div>
+          <p class="plan-pkg">{{ plan.packageType || '无包装' }}</p>
+          <div class="plan-meta">
+            <p class="plan-price">¥{{ Number(plan.totalPrice || 0).toFixed(2) }}</p>
+            <p class="plan-time">{{ formatTime(plan.createTime) }}</p>
+          </div>
+          <div class="plan-actions" @click.stop>
+            <button class="btn-preview" @click="viewPlan(plan.id)">查看详情</button>
+            <button class="btn-delete" @click="deletePlan(plan.id)">删除</button>
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 </template>
@@ -35,6 +49,12 @@ import api from '../api/index.js'
 const router = useRouter()
 const plans = ref([])
 const loading = ref(true)
+const previewFlowers = [
+  ['red-rose.webp', 'white-rose.webp'],
+  ['sunflower.webp', 'white-daisy.webp'],
+  ['pink-tulip.webp', 'white-lily.webp']
+]
+const previewImage = (name) => `/images/diy/${name}`
 
 const statusText = (s) => {
   if (s === 'ordered') return '已下单'
@@ -70,31 +90,38 @@ const deletePlan = async (id) => {
 </script>
 
 <style scoped>
-.plan-list-page { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.page-header h2 { font-size: 1.5rem; color: #333; }
-.create-btn { text-decoration: none; background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%); color: white; padding: 0.7rem 1.5rem; border-radius: 25px; font-size: 0.95rem; transition: all 0.3s; }
-.create-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,107,157,0.4); }
-
-.loading-box { text-align: center; padding: 4rem; color: #999; }
-.empty-hint { text-align: center; padding: 4rem; color: #999; }
-.empty-hint p { font-size: 1.1rem; margin-bottom: 1.5rem; }
-.go-diy-btn { text-decoration: none; display: inline-block; background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%); color: white; padding: 0.8rem 2rem; border-radius: 25px; font-size: 1rem; }
-
-.plan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
-.plan-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.3s; text-align: center; position: relative; }
-.plan-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-.plan-icon { font-size: 3rem; margin-bottom: 0.8rem; }
-.plan-card h3 { font-size: 1.1rem; margin-bottom: 0.4rem; color: #333; }
-.plan-pkg { font-size: 0.85rem; color: #888; margin-bottom: 0.3rem; }
-.plan-price { font-size: 1.3rem; font-weight: bold; color: #c44569; margin-bottom: 0.3rem; }
-.plan-status { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 10px; display: inline-block; margin-bottom: 0.3rem; }
-.plan-status.saved, .plan-status\:saved, .plan-status[class*="1"] { background: #e8f5e9; color: #2e7d32; }
-.plan-status.ordered { background: #e3f2fd; color: #1565c0; }
-.plan-time { font-size: 0.75rem; color: #bbb; margin-bottom: 0.8rem; }
-.plan-actions { display: flex; gap: 0.5rem; justify-content: center; }
-.btn-preview { padding: 0.5rem 1.2rem; background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%); color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s; }
-.btn-preview:hover { transform: scale(1.05); }
-.btn-delete { padding: 0.5rem 1.2rem; background: #ffebee; color: #c62828; border: none; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s; }
-.btn-delete:hover { background: #ffcdd2; }
+.plan-list-page { max-width: 1200px; margin: 0 auto; }
+.page-header { display: flex; justify-content: space-between; align-items: end; gap: 2rem; margin-bottom: 2rem; }
+.eyebrow { color: var(--color-primary); font-size: 0.76rem; font-weight: 750; letter-spacing: 0.12em; margin-bottom: 0.45rem; }
+.page-header h2 { color: var(--color-ink); font-size: 1.85rem; line-height: 1.2; }
+.page-desc { color: var(--color-muted); font-size: 0.88rem; margin-top: 0.45rem; }
+.create-btn, .go-diy-btn { display: inline-block; text-decoration: none; color: #fdfbf7; background: var(--color-primary); border-radius: var(--radius-control); font-size: 0.88rem; font-weight: 700; }
+.create-btn { padding: 0.7rem 1.1rem; white-space: nowrap; }
+.create-btn:hover, .go-diy-btn:hover { background: var(--color-primary-dark); }
+.loading-box, .empty-hint { text-align: center; padding: 5rem 1rem; color: var(--color-muted); background: var(--color-surface); border: 1px dashed #cbd4cc; border-radius: var(--radius-card); }
+.empty-hint p { font-size: 1rem; margin-bottom: 1.25rem; }
+.go-diy-btn { padding: 0.7rem 1.2rem; }
+.plan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1.2rem; }
+.plan-card { overflow: hidden; background: var(--color-surface-strong); border: 1px solid var(--color-line); border-radius: var(--radius-card); box-shadow: 0 4px 18px rgba(40,63,49,0.05); cursor: pointer; transition: transform 180ms ease, box-shadow 180ms ease; }
+.plan-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
+.plan-preview { position: relative; height: 190px; overflow: hidden; background: #e9eee9; }
+.plan-preview img { position: absolute; bottom: -2.5rem; width: 8.5rem; height: 15rem; object-fit: contain; filter: drop-shadow(0 8px 10px rgba(40,63,49,0.12)); }
+.plan-preview img:nth-child(1) { left: 50%; transform: translateX(-72%) rotate(-12deg); z-index: 2; }
+.plan-preview img:nth-child(2) { left: 50%; transform: translateX(-25%) rotate(12deg); z-index: 3; }
+.plan-preview img:nth-child(3) { right: 0.5rem; transform: rotate(25deg); z-index: 1; }
+.plan-body { padding: 1rem; }
+.plan-title-row, .plan-meta { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.plan-card h3 { min-width: 0; overflow: hidden; color: var(--color-ink); font-size: 1.02rem; text-overflow: ellipsis; white-space: nowrap; }
+.plan-pkg { min-height: 2.8em; color: var(--color-muted); font-size: 0.78rem; margin: 0.45rem 0 0.75rem; }
+.plan-price { color: var(--color-primary-dark); font-size: 1.2rem; font-weight: 750; }
+.plan-status { flex: 0 0 auto; padding: 0.2rem 0.48rem; color: var(--color-leaf-dark); background: var(--color-leaf-soft); border-radius: 5px; font-size: 0.7rem; }
+.plan-status.ordered { color: #31556b; background: #e4eef3; }
+.plan-time { color: #8b938e; font-size: 0.7rem; }
+.plan-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; padding-top: 0.85rem; border-top: 1px solid var(--color-line); }
+.btn-preview, .btn-delete { flex: 1; min-height: 2.3rem; border-radius: var(--radius-control); cursor: pointer; font-size: 0.78rem; font-weight: 650; }
+.btn-preview { color: #fdfbf7; background: var(--color-primary); border: 1px solid var(--color-primary); }
+.btn-delete { color: var(--color-danger); background: transparent; border: 1px solid #e4c3c9; }
+.btn-preview:hover { background: var(--color-primary-dark); }
+.btn-delete:hover { background: #fbebee; }
+@media (max-width: 600px) { .page-header { align-items: stretch; flex-direction: column; gap: 1rem; } .create-btn { text-align: center; } .plan-grid { grid-template-columns: 1fr; } .plan-card { display: grid; grid-template-columns: 9rem 1fr; } .plan-preview { height: 100%; min-height: 210px; } .plan-preview img { width: 6.5rem; } }
 </style>

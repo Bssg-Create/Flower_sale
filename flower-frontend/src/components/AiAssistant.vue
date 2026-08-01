@@ -128,8 +128,8 @@ const sendMessage = async () => {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 9999;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  z-index: 80;
+  font-family: inherit;
 }
 
 /* 浮动气泡 */
@@ -137,8 +137,8 @@ const sendMessage = async () => {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #e91e80, #ff6fa7);
-  box-shadow: 0 4px 16px rgba(233, 30, 128, 0.4);
+  background: var(--color-leaf);
+  box-shadow: 0 8px 24px rgba(40, 63, 49, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -147,23 +147,24 @@ const sendMessage = async () => {
 }
 .ai-bubble:hover {
   transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(233, 30, 128, 0.55);
+  box-shadow: 0 10px 28px rgba(40, 63, 49, 0.28);
 }
 
 /* 聊天面板 */
 .ai-panel {
   width: 360px;
   height: 500px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: 0 18px 46px rgba(25, 39, 30, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .ai-header {
-  background: linear-gradient(135deg, #e91e80, #ff6fa7);
+  background: var(--color-leaf);
   color: #fff;
   padding: 14px 18px;
   font-size: 16px;
@@ -187,16 +188,16 @@ const sendMessage = async () => {
   flex: 1;
   overflow-y: auto;
   padding: 14px;
-  background: #fafafa;
+  background: #f6f8f5;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 .ai-welcome {
-  background: #fff3f8;
-  color: #c2185b;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -215,27 +216,27 @@ const sendMessage = async () => {
 .ai-msg-content {
   max-width: 85%;
   padding: 10px 14px;
-  border-radius: 14px;
+  border-radius: 10px;
   font-size: 13px;
   line-height: 1.6;
   word-break: break-word;
   white-space: pre-wrap;
 }
 .ai-msg.user .ai-msg-content {
-  background: linear-gradient(135deg, #e91e80, #ff6fa7);
+  background: var(--color-primary);
   color: #fff;
   border-bottom-right-radius: 4px;
 }
 .ai-msg.assistant .ai-msg-content {
   background: #fff;
-  color: #333;
+  color: var(--color-ink);
   border-bottom-left-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .ai-cursor {
   display: inline;
-  color: #e91e80;
+  color: var(--color-primary);
   animation: blink 0.8s infinite;
   font-size: 13px;
 }
@@ -253,27 +254,27 @@ const sendMessage = async () => {
 .ai-input-row {
   display: flex;
   padding: 10px 14px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-line);
   gap: 8px;
   background: #fff;
 }
 .ai-input {
   flex: 1;
-  border: 1px solid #e0e0e0;
-  border-radius: 20px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
   padding: 8px 16px;
   font-size: 13px;
   outline: none;
   transition: border 0.2s;
 }
 .ai-input:focus {
-  border-color: #e91e80;
+  border-color: var(--color-leaf);
 }
 .ai-send {
-  background: linear-gradient(135deg, #e91e80, #ff6fa7);
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-control);
   padding: 8px 18px;
   font-size: 13px;
   cursor: pointer;
@@ -293,5 +294,11 @@ const sendMessage = async () => {
 .slide-up-leave-to {
   opacity: 0;
   transform: translateY(20px);
+}
+
+@media (max-width: 520px) {
+  .ai-assistant { right: 12px; bottom: 12px; }
+  .ai-bubble { width: 50px; height: 50px; }
+  .ai-panel { width: calc(100vw - 24px); height: min(520px, calc(100vh - 150px)); }
 }
 </style>

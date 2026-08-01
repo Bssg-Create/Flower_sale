@@ -204,7 +204,6 @@ const placeOrder = async () => {
 .plan-detail-page {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 2rem;
 }
 
 .back-nav {
@@ -213,8 +212,8 @@ const placeOrder = async () => {
 
 .back-link {
   text-decoration: none;
-  color: #c44569;
-  font-size: 0.95rem;
+  color: var(--color-primary-dark);
+  font-size: 0.88rem;
   font-weight: 600;
 }
 
@@ -222,7 +221,7 @@ const placeOrder = async () => {
 .error-box {
   text-align: center;
   padding: 4rem;
-  color: #999;
+  color: var(--color-muted);
   font-size: 1.1rem;
 }
 
@@ -235,9 +234,10 @@ const placeOrder = async () => {
 
 .plan-preview-card,
 .info-card {
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: 0 4px 18px rgba(40,63,49,0.05);
 }
 
 .plan-preview-card {
@@ -246,19 +246,19 @@ const placeOrder = async () => {
 }
 
 .plan-preview-card h2 {
-  color: #333;
+  color: var(--color-ink);
   font-size: 1.35rem;
   margin-top: 1rem;
   margin-bottom: 0.45rem;
 }
 
 .preview-pkg {
-  color: #888;
+  color: var(--color-muted);
   margin-bottom: 0.45rem;
 }
 
 .preview-price {
-  color: #c44569;
+  color: var(--color-primary-dark);
   font-size: 1.8rem;
   font-weight: 700;
   margin-bottom: 0.45rem;
@@ -266,10 +266,10 @@ const placeOrder = async () => {
 
 .preview-status {
   display: inline-block;
-  border-radius: 999px;
+  border-radius: 5px;
   padding: 0.25rem 0.85rem;
-  color: #2e7d32;
-  background: #e8f5e9;
+  color: var(--color-leaf-dark);
+  background: var(--color-leaf-soft);
   font-size: 0.85rem;
 }
 
@@ -279,7 +279,7 @@ const placeOrder = async () => {
 }
 
 .info-card h3 {
-  color: #333;
+  color: var(--color-ink);
   font-size: 1.12rem;
   margin-bottom: 1rem;
 }
@@ -290,7 +290,7 @@ const placeOrder = async () => {
   align-items: center;
   gap: 0.75rem;
   padding: 0.7rem 0;
-  border-bottom: 1px solid #f2f2f2;
+  border-bottom: 1px solid var(--color-line);
 }
 
 .item-row:last-child {
@@ -301,17 +301,17 @@ const placeOrder = async () => {
   width: 44px;
   height: 44px;
   object-fit: contain;
-  border-radius: 12px;
-  background: #fff7fa;
+  border-radius: 8px;
+  background: #edf1ed;
 }
 
 .item-name {
-  color: #333;
+  color: var(--color-ink);
   font-size: 0.95rem;
 }
 
 .item-qty {
-  color: #c44569;
+  color: var(--color-primary-dark);
   font-weight: 700;
 }
 
@@ -323,30 +323,34 @@ const placeOrder = async () => {
 
 .order-input {
   padding: 0.72rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
+  color: var(--color-ink);
+  background: #fbfcfa;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
   font-size: 0.9rem;
   font-family: inherit;
 }
 
 .order-input:focus {
   outline: none;
-  border-color: #c44569;
+  border-color: var(--color-leaf);
+  box-shadow: 0 0 0 3px rgba(54,95,75,0.1);
 }
 
 .order-btn {
   width: 100%;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   padding: 0.9rem;
   color: white;
-  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+  background: var(--color-primary);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .order-btn:hover:not(:disabled) {
   transform: translateY(-2px);
+  background: var(--color-primary-dark);
 }
 
 .order-btn:disabled {
@@ -357,13 +361,16 @@ const placeOrder = async () => {
 .ordered-hint {
   text-align: center;
   padding: 2rem;
-  color: #2e7d32;
+  color: var(--color-leaf-dark);
+  background: var(--color-leaf-soft);
+  border: 1px solid #bed3c5;
+  border-radius: var(--radius-card);
   font-size: 1.1rem;
 }
 
 @media (max-width: 900px) {
   .plan-detail-page {
-    padding: 1rem;
+    padding: 0;
   }
 
   .detail-content {
