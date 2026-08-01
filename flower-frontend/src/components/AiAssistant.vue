@@ -1,11 +1,11 @@
 <template>
   <div class="ai-assistant">
     <!-- 浮动气泡按钮 -->
-    <button class="ai-bubble" type="button" aria-label="打开花店 AI 助手" @click="toggleChat" v-show="!showChat">
+    <div class="ai-bubble" @click="toggleChat" v-show="!showChat">
       <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="white" stroke-width="2">
         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
       </svg>
-    </button>
+    </div>
 
     <!-- 聊天面板 -->
     <transition name="slide-up">
@@ -17,7 +17,7 @@
 
         <div class="ai-messages" ref="msgBox">
           <div class="ai-welcome">
-            你好！我是花店 AI 助手，可以帮你选花、搭配花束、解答疑问。
+            👋 你好！我是花店AI助手，可以帮你选花、搭配花束、解答疑问，随时问我哦～
           </div>
 
           <div v-for="(msg, i) in messages" :key="i" :class="['ai-msg', msg.role]">
@@ -129,7 +129,7 @@ const sendMessage = async () => {
   bottom: 24px;
   right: 24px;
   z-index: 9999;
-  font-family: inherit;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* 浮动气泡 */
@@ -137,37 +137,33 @@ const sendMessage = async () => {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  border: none;
-  color: white;
-  background: var(--color-brand);
-  box-shadow: 0 10px 26px rgba(132, 45, 74, 0.28);
+  background: linear-gradient(135deg, #e91e80, #ff6fa7);
+  box-shadow: 0 4px 16px rgba(233, 30, 128, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .ai-bubble:hover {
-  transform: translateY(-2px);
-  background: var(--color-brand-strong);
-  box-shadow: 0 14px 30px rgba(132, 45, 74, 0.34);
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(233, 30, 128, 0.55);
 }
 
 /* 聊天面板 */
 .ai-panel {
   width: 360px;
   height: 500px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-float);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .ai-header {
-  background: var(--color-forest);
+  background: linear-gradient(135deg, #e91e80, #ff6fa7);
   color: #fff;
   padding: 14px 18px;
   font-size: 16px;
@@ -191,14 +187,14 @@ const sendMessage = async () => {
   flex: 1;
   overflow-y: auto;
   padding: 14px;
-  background: var(--color-canvas);
+  background: #fafafa;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 .ai-welcome {
-  background: var(--color-brand-soft);
-  color: var(--color-brand-strong);
+  background: #fff3f8;
+  color: #c2185b;
   padding: 12px 14px;
   border-radius: 12px;
   font-size: 13px;
@@ -226,20 +222,20 @@ const sendMessage = async () => {
   white-space: pre-wrap;
 }
 .ai-msg.user .ai-msg-content {
-  background: var(--color-brand);
+  background: linear-gradient(135deg, #e91e80, #ff6fa7);
   color: #fff;
   border-bottom-right-radius: 4px;
 }
 .ai-msg.assistant .ai-msg-content {
   background: #fff;
-  color: var(--color-ink);
+  color: #333;
   border-bottom-left-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .ai-cursor {
   display: inline;
-  color: var(--color-brand);
+  color: #e91e80;
   animation: blink 0.8s infinite;
   font-size: 13px;
 }
@@ -249,7 +245,7 @@ const sendMessage = async () => {
 
 .ai-typing {
   font-size: 12px;
-  color: var(--color-muted);
+  color: #999;
   padding-left: 4px;
 }
 
@@ -257,27 +253,27 @@ const sendMessage = async () => {
 .ai-input-row {
   display: flex;
   padding: 10px 14px;
-  border-top: 1px solid var(--color-line);
+  border-top: 1px solid #eee;
   gap: 8px;
   background: #fff;
 }
 .ai-input {
   flex: 1;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-control);
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
   padding: 8px 16px;
   font-size: 13px;
   outline: none;
   transition: border 0.2s;
 }
 .ai-input:focus {
-  border-color: var(--color-brand);
+  border-color: #e91e80;
 }
 .ai-send {
-  background: var(--color-brand);
+  background: linear-gradient(135deg, #e91e80, #ff6fa7);
   color: #fff;
   border: none;
-  border-radius: var(--radius-control);
+  border-radius: 20px;
   padding: 8px 18px;
   font-size: 13px;
   cursor: pointer;
@@ -297,10 +293,5 @@ const sendMessage = async () => {
 .slide-up-leave-to {
   opacity: 0;
   transform: translateY(20px);
-}
-
-@media (max-width: 480px) {
-  .ai-assistant { right: 14px; bottom: 14px; }
-  .ai-panel { width: calc(100vw - 28px); height: min(520px, calc(100dvh - 28px)); }
 }
 </style>

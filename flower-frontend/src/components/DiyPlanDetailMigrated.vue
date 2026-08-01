@@ -17,7 +17,7 @@
             compact
           />
           <h2>{{ plan.name }}</h2>
-          <p class="preview-pkg">包装：{{ packageDisplayName }}</p>
+          <p class="preview-pkg">包装: {{ packageDisplayName }}</p>
           <p class="preview-price">¥{{ Number(plan.totalPrice || 0).toFixed(2) }}</p>
           <p class="preview-status">{{ statusText(plan.status) }}</p>
         </div>
@@ -38,9 +38,9 @@
         <section class="info-card order-section" v-if="plan.status !== 'ordered'">
           <h3>立即购买</h3>
           <div class="order-form">
-            <label>收货人<input v-model="form.receiverName" placeholder="请输入姓名" class="order-input" /></label>
-            <label>联系电话<input v-model="form.receiverPhone" placeholder="请输入手机号" class="order-input" /></label>
-            <label>收货地址<textarea v-model="form.shippingAddress" placeholder="请输入详细地址" class="order-input" rows="2"></textarea></label>
+            <input v-model="form.receiverName" placeholder="收货人姓名" class="order-input" />
+            <input v-model="form.receiverPhone" placeholder="收货人电话" class="order-input" />
+            <textarea v-model="form.shippingAddress" placeholder="收货地址" class="order-input" rows="2"></textarea>
             <button class="order-btn" @click="placeOrder" :disabled="ordering">
               {{ ordering ? '下单中...' : `立即下单 ¥${Number(plan.totalPrice || 0).toFixed(2)}` }}
             </button>
@@ -204,7 +204,7 @@ const placeOrder = async () => {
 .plan-detail-page {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 0.5rem 0 2rem;
+  padding: 2rem;
 }
 
 .back-nav {
@@ -213,7 +213,7 @@ const placeOrder = async () => {
 
 .back-link {
   text-decoration: none;
-  color: var(--color-brand);
+  color: #c44569;
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -222,7 +222,7 @@ const placeOrder = async () => {
 .error-box {
   text-align: center;
   padding: 4rem;
-  color: var(--color-muted);
+  color: #999;
   font-size: 1.1rem;
 }
 
@@ -235,10 +235,9 @@ const placeOrder = async () => {
 
 .plan-preview-card,
 .info-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-soft);
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
 }
 
 .plan-preview-card {
@@ -247,19 +246,19 @@ const placeOrder = async () => {
 }
 
 .plan-preview-card h2 {
-  color: var(--color-ink);
+  color: #333;
   font-size: 1.35rem;
   margin-top: 1rem;
   margin-bottom: 0.45rem;
 }
 
 .preview-pkg {
-  color: var(--color-muted);
+  color: #888;
   margin-bottom: 0.45rem;
 }
 
 .preview-price {
-  color: var(--color-brand);
+  color: #c44569;
   font-size: 1.8rem;
   font-weight: 700;
   margin-bottom: 0.45rem;
@@ -280,7 +279,7 @@ const placeOrder = async () => {
 }
 
 .info-card h3 {
-  color: var(--color-ink);
+  color: #333;
   font-size: 1.12rem;
   margin-bottom: 1rem;
 }
@@ -291,7 +290,7 @@ const placeOrder = async () => {
   align-items: center;
   gap: 0.75rem;
   padding: 0.7rem 0;
-  border-bottom: 1px solid var(--color-line);
+  border-bottom: 1px solid #f2f2f2;
 }
 
 .item-row:last-child {
@@ -303,53 +302,45 @@ const placeOrder = async () => {
   height: 44px;
   object-fit: contain;
   border-radius: 12px;
-  background: var(--color-brand-soft);
+  background: #fff7fa;
 }
 
 .item-name {
-  color: var(--color-ink);
+  color: #333;
   font-size: 0.95rem;
 }
 
 .item-qty {
-  color: var(--color-brand);
+  color: #c44569;
   font-weight: 700;
 }
 
 .order-form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.order-form label {
-  color: var(--color-muted);
-  font-size: 0.82rem;
-  font-weight: 650;
+  gap: 0.6rem;
 }
 
 .order-input {
-  width: 100%;
-  margin-top: 0.35rem;
   padding: 0.72rem;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-control);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
   font-size: 0.9rem;
   font-family: inherit;
 }
 
 .order-input:focus {
   outline: none;
-  border-color: var(--color-brand);
+  border-color: #c44569;
 }
 
 .order-btn {
   width: 100%;
   border: none;
-  border-radius: var(--radius-control);
+  border-radius: 12px;
   padding: 0.9rem;
   color: white;
-  background: var(--color-forest);
+  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -372,7 +363,7 @@ const placeOrder = async () => {
 
 @media (max-width: 900px) {
   .plan-detail-page {
-    padding: 0;
+    padding: 1rem;
   }
 
   .detail-content {

@@ -2,7 +2,7 @@
   <div class="diy-page">
     <div class="page-header">
       <div>
-        <p class="eyebrow">花束工作台</p>
+        <p class="eyebrow">DIY BOUQUET</p>
         <h2>设计一束只属于你的花</h2>
       </div>
       <button class="ghost-btn" type="button" @click="floristArrange" :disabled="designItems.length === 0">一键整理</button>
@@ -23,7 +23,7 @@
             :class="{ active: selectedCategory === cat.id }"
             @click="selectedCategory = cat.id"
           >
-            {{ cat.name }}
+            {{ cat.icon }} {{ cat.name }}
           </button>
         </div>
 
@@ -143,9 +143,9 @@
           <p class="save-success">花束已保存成功！</p>
           <router-link to="/user/plans" class="view-plans-link">查看我的方案</router-link>
           <div class="order-form">
-            <label>收货人<input v-model="orderForm.receiverName" placeholder="请输入姓名" class="order-input" /></label>
-            <label>联系电话<input v-model="orderForm.receiverPhone" placeholder="请输入手机号" class="order-input" /></label>
-            <label>收货地址<input v-model="orderForm.shippingAddress" placeholder="请输入详细地址" class="order-input" /></label>
+            <input v-model="orderForm.receiverName" placeholder="收货人姓名" class="order-input" />
+            <input v-model="orderForm.receiverPhone" placeholder="收货人电话" class="order-input" />
+            <input v-model="orderForm.shippingAddress" placeholder="收货地址" class="order-input" />
             <button class="order-btn" @click="placeOrder" :disabled="ordering">
               {{ ordering ? '下单中...' : '立即下单' }}
             </button>
@@ -450,29 +450,31 @@ const placeOrder = async () => {
 
 <style scoped>
 .diy-page {
-  --diy-surface: var(--color-surface);
-  --diy-paper: var(--color-surface-soft);
-  --diy-line: var(--color-line);
-  --diy-ink: var(--color-ink);
-  --diy-muted: var(--color-muted);
-  --diy-accent: var(--color-brand);
-  --diy-green: var(--color-forest);
+  --diy-surface: #fffefa;
+  --diy-paper: #f6f4ef;
+  --diy-line: rgba(70, 62, 49, 0.12);
+  --diy-ink: #25231f;
+  --diy-muted: #746d60;
+  --diy-accent: #b44646;
+  --diy-green: #2f7356;
   max-width: 1440px;
   margin: 0 auto;
 }
 .page-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
 .eyebrow { color: var(--diy-accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0; margin-bottom: 0.25rem; }
 .page-header h2 { color: var(--diy-ink); font-size: 1.55rem; }
-.ghost-btn { border: 1px solid var(--color-brand-line); border-radius: var(--radius-control); padding: 0.65rem 1.1rem; color: var(--diy-accent); background: var(--diy-surface); cursor: pointer; box-shadow: var(--shadow-soft); }
+.ghost-btn { border: 1px solid rgba(180, 70, 70, 0.22); border-radius: 999px; padding: 0.65rem 1.1rem; color: var(--diy-accent); background: var(--diy-surface); cursor: pointer; box-shadow: 0 10px 22px rgba(180, 70, 70, 0.08); }
 .ghost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .diy-layout { display: grid; grid-template-columns: minmax(280px, 330px) minmax(460px, 1fr) minmax(280px, 330px); gap: 1.2rem; align-items: start; }
 .side-panel, .canvas-card {
   border: 1px solid var(--diy-line);
-  border-radius: var(--radius-card);
-  background: var(--diy-surface);
-  box-shadow: var(--shadow-card);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255,254,250,0.96), rgba(250,246,238,0.94)),
+    repeating-linear-gradient(90deg, rgba(111, 88, 57, 0.035) 0 1px, transparent 1px 22px);
+  box-shadow: 0 14px 32px rgba(48, 41, 32, 0.08);
 }
-.side-panel { position: sticky; top: 96px; padding: 1.25rem; }
+.side-panel { padding: 1.25rem; }
 .panel-title, .design-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
 .panel-title h3, .design-header h3 { color: var(--diy-ink); font-size: 1.12rem; }
 .panel-title span, .design-header p { color: var(--diy-muted); font-size: 0.86rem; }
@@ -480,9 +482,9 @@ const placeOrder = async () => {
 .category-filter button { border: 1px solid rgba(70, 62, 49, 0.12); border-radius: 999px; background: rgba(255,254,250,0.8); color: var(--diy-muted); padding: 0.4rem 0.72rem; cursor: pointer; transition: all 0.2s; }
 .category-filter button.active, .category-filter button:hover { color: white; border-color: transparent; background: var(--diy-accent); }
 .flowers-list { max-height: 660px; overflow-y: auto; padding-right: 0.2rem; }
-.flower-item { display: grid; grid-template-columns: 58px 1fr 30px; align-items: center; gap: 0.75rem; padding: 0.75rem; margin-bottom: 0.65rem; border-radius: 12px; background: var(--color-surface-soft); border: 1px solid transparent; cursor: grab; transition: all 0.2s; }
-.flower-item:hover { border-color: var(--color-brand-line); background: var(--color-brand-soft); box-shadow: var(--shadow-soft); }
-.flower-thumb-wrap { width: 58px; height: 58px; border-radius: 12px; background: linear-gradient(180deg, #fff, #edf1ec); display: flex; align-items: center; justify-content: center; }
+.flower-item { display: grid; grid-template-columns: 58px 1fr 30px; align-items: center; gap: 0.75rem; padding: 0.75rem; margin-bottom: 0.65rem; border-radius: 8px; background: rgba(255,254,250,0.74); border: 1px solid transparent; cursor: grab; transition: all 0.2s; }
+.flower-item:hover { border-color: rgba(180, 70, 70, 0.24); background: #fffaf3; box-shadow: 0 8px 18px rgba(68, 51, 32, 0.06); }
+.flower-thumb-wrap { width: 58px; height: 58px; border-radius: 8px; background: linear-gradient(180deg, #fffaf3, #f1e4d5); display: flex; align-items: center; justify-content: center; }
 .flower-thumb { width: 52px; height: 52px; object-fit: contain; }
 .flower-info h4 { color: var(--diy-ink); font-size: 0.95rem; margin-bottom: 0.2rem; }
 .flower-info p { color: var(--diy-accent); font-size: 0.82rem; font-weight: 600; }
@@ -491,15 +493,15 @@ const placeOrder = async () => {
 .add-btn { width: 30px; height: 30px; border: none; border-radius: 50%; background: var(--diy-accent); color: white; font-size: 1.1rem; cursor: pointer; }
 .workspace-panel { min-width: 0; }
 .template-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
-.template-card { min-height: 78px; text-align: left; border: 1px solid var(--diy-line); border-radius: 12px; background: var(--diy-surface); padding: 0.8rem; cursor: pointer; box-shadow: var(--shadow-soft); }
-.template-card.active { border-color: var(--color-brand); background: var(--color-brand-soft); box-shadow: 0 0 0 3px rgba(166, 63, 95, 0.08); }
+.template-card { min-height: 78px; text-align: left; border: 1px solid var(--diy-line); border-radius: 8px; background: rgba(255,254,250,0.86); padding: 0.8rem; cursor: pointer; box-shadow: 0 6px 16px rgba(68, 51, 32, 0.05); }
+.template-card.active { border-color: rgba(180, 70, 70, 0.48); background: #fffaf3; box-shadow: 0 0 0 3px rgba(180, 70, 70, 0.08); }
 .template-card strong, .template-card span { display: block; }
 .template-card strong { color: var(--diy-ink); margin-bottom: 0.35rem; }
 .template-card span { color: var(--diy-muted); font-size: 0.78rem; line-height: 1.45; }
 .canvas-card { padding: 1.25rem; }
 .design-header { margin-bottom: 1rem; }
 .package-select { display: flex; align-items: center; gap: 0.5rem; color: var(--diy-muted); white-space: nowrap; }
-.package-select select { border: 1px solid var(--diy-line); border-radius: var(--radius-control); padding: 0.55rem 0.7rem; background: var(--diy-surface); color: var(--diy-ink); }
+.package-select select { border: 1px solid rgba(70, 62, 49, 0.14); border-radius: 8px; padding: 0.55rem 0.7rem; background: var(--diy-surface); color: var(--diy-ink); }
 .recipe-list, .summary-card { margin-top: 1rem; }
 .recipe-item, .summary-row { display: flex; justify-content: space-between; gap: 0.8rem; padding: 0.65rem 0; border-bottom: 1px solid rgba(70, 62, 49, 0.1); color: #555; }
 .recipe-item strong { color: var(--diy-ink); }
@@ -507,25 +509,23 @@ const placeOrder = async () => {
 .empty-state, .loading-box { padding: 1.5rem 0; color: #999; text-align: center; }
 .card-input { display: block; margin-top: 1rem; }
 .card-input span, .mood-box > span { display: block; color: var(--diy-muted); font-size: 0.9rem; margin-bottom: 0.45rem; }
-.card-input textarea { width: 100%; resize: none; border: 1px solid var(--diy-line); border-radius: var(--radius-control); padding: 0.75rem; font-family: inherit; color: var(--diy-ink); background: var(--diy-surface); }
+.card-input textarea { width: 100%; resize: none; border: 1px solid rgba(180, 70, 70, 0.18); border-radius: 8px; padding: 0.75rem; font-family: inherit; color: #444; background: var(--diy-surface); }
 .mood-box { margin-top: 1rem; }
 .mood-box div { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .summary-row.total { border-bottom: none; padding-top: 0.9rem; }
 .summary-row.total strong { color: var(--diy-accent); font-size: 1.35rem; }
 .save-btn, .order-btn { width: 100%; border: none; border-radius: 12px; color: white; cursor: pointer; transition: all 0.2s; }
-.save-btn { margin-top: 1rem; padding: 0.95rem; background: var(--color-brand); font-size: 1rem; }
+.save-btn { margin-top: 1rem; padding: 0.95rem; background: linear-gradient(135deg, #cf6d76 0%, #b44646 100%); font-size: 1rem; }
 .save-btn:hover:not(:disabled), .order-btn:hover:not(:disabled) { transform: translateY(-2px); }
 .save-btn:disabled, .order-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .order-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(70, 62, 49, 0.1); }
 .save-success { color: #2e7d32; font-weight: 700; text-align: center; margin-bottom: 0.7rem; }
 .view-plans-link { display: block; color: var(--diy-accent); text-align: center; text-decoration: none; margin-bottom: 0.8rem; font-weight: 600; }
-.order-form { display: flex; flex-direction: column; gap: 0.7rem; }
-.order-form label { color: var(--diy-muted); font-size: 0.82rem; font-weight: 600; }
-.order-input { width: 100%; margin-top: 0.35rem; border: 1px solid var(--diy-line); border-radius: var(--radius-control); padding: 0.65rem; background: var(--diy-surface); }
-.order-btn { padding: 0.8rem; background: var(--diy-green); }
+.order-form { display: flex; flex-direction: column; gap: 0.55rem; }
+.order-input { border: 1px solid rgba(70, 62, 49, 0.14); border-radius: 8px; padding: 0.65rem; background: var(--diy-surface); }
+.order-btn { padding: 0.8rem; background: linear-gradient(135deg, #3d8263 0%, #2f7356 100%); }
 @media (max-width: 1180px) {
   .diy-layout { grid-template-columns: 1fr; }
-  .side-panel { position: static; }
   .flower-panel { order: 2; }
   .workspace-panel { order: 1; }
   .summary-panel { order: 3; }
