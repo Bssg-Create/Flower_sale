@@ -1,5 +1,89 @@
 # 项目上下文记录
 
+## 2026-08-01（IDEA 一键启动配置创建与实测完成）
+
+### 已完成
+- 已在项目共享 `.run` 目录创建并由 IDEA MCP 成功识别三个运行配置：
+  - `.run/Flower Backend - Dev.run.xml`：Spring Boot，模块 `flower-web`，入口 `com.flower.FlowerApplication`，工作目录 `$PROJECT_DIR$`。
+  - `.run/Flower Frontend - Dev.run.xml`：使用现有本地 Node `v20.20.2`、npm `10.8.2` 和 `flower-frontend/node_modules`，执行 `npm run dev -- --host 127.0.0.1 --open`。
+  - `.run/Flower Full Stack - Dev.run.xml`：Compound，同时启动上述前后端配置。
+- 原有两个临时同名 `FlowerApplication` 配置没有删除或覆盖；日常开发应选择新建的 `Flower Full Stack - Dev`。
+- 通过 IDEA MCP 实际执行了 `Flower Full Stack - Dev`。MCP 对 Compound 返回 `Execution failed: The process has failed to start.`，但这是 Compound 没有单一进程句柄时的返回；从干净端口重新执行后，两个子配置均实际启动：
+  - Spring Boot 监听 `8081`，JVM 主类为 `com.flower.FlowerApplication`。
+  - Vite 监听 `127.0.0.1:5173`，`--open` 触发了浏览器访问。
+- HTTP 自测通过：
+  - `http://127.0.0.1:8081/` 返回 `200 text/html`。
+  - `http://127.0.0.1:8081/api/diy/flowers` 返回 HTTP `200` 且业务码 `code:200`。
+  - `http://127.0.0.1:5173/` 返回 `200`，HTML 同时包含 `/@vite/client` 和 `/src/main.js`。
+- 桌面端浏览器实测 `http://127.0.0.1:5173/#/user/diy`，确认页面包含 `DIY BOUQUET`、花材架、花艺模板、花束工作台和花材清单，实际加载的是 `DiyPageMigrated.vue` 迁移版。
+- 最终验证截图保存在项目外的 Codex 可视化目录，未纳入 Git；截图已在本轮对话中展示。
+
+### 清理与边界
+- 已停止旧的 IDEA 后端测试实例、本轮诊断误启的 `5174` 前端实例，以及最终 Compound 验证产生的 `8081`、`5173` 进程；当前三个端口均无测试监听。
+- 临时截图脚本、隔离 Chrome 用户目录和调试端口均已清理；只保留最终交付截图和正常开发所需 `.run` 配置。
+- 本轮没有安装或下载依赖，没有修改业务源码、数据库、`flower-frontend/dist`、后端 static 或 DIY 功能。
+- 原有 `CONTEXT.md` 修改和新增 `IDEA启动与前端同步使用方案.md` 均已保留，没有还原或覆盖。
+
+## 2026-08-01（开启新对话：IDEA 一键启动方案交接）
+
+### 当前准确状态
+- 项目路径：`D:\GProject\flower_trae\flower-sales`。
+- Git 分支：`master`；远端：`https://github.com/Bssg-Create/Flower_sale.git`；当前 HEAD：`44baad9 Record successful rollback push`。
+- 当前工作区不是干净状态，必须保留并继续处理：
+  - `CONTEXT.md` 已修改，用于记录本轮运行链路诊断和交接。
+  - `IDEA启动与前端同步使用方案.md` 为本轮新增、尚未跟踪的使用文档。
+- 本轮没有修改业务源码、数据库、前端构建产物或 IDEA 运行配置，也没有提交或推送。
+
+### 已完成的运行链路诊断
+- IDEA MCP 检测到两个同名 `FlowerApplication` 配置：一个 Spring Boot 类型、一个普通 Java 类型；没有 Vite 运行配置。
+- Spring Boot 实际从 `flower-web/target/classes` 启动，监听 `8081`，并加载 `classpath resource [static/index.html]`。
+- `5173` 由 Vite 直接加载 `flower-frontend/src`；Vue Router 当前将 `/user/diy` 指向 `DiyPageMigrated.vue`，实际截图显示迁移版 `DIY BOUQUET` 页面。
+- `8081` 固定加载后端 static 中的 `/assets/index-BsFUSw8F.js` 和 `/assets/index-BMJU6sKl.css`，实际截图显示旧 `DiyPage.vue` 页面。
+- `flower-frontend/dist` 当前不存在；`flower-web/src/main/resources/static` 与 `flower-web/target/classes/static` 中的入口及旧 JS 一致，均为 2026-06-09 的旧构建产物。
+- Maven POM 没有前端构建或 `dist` 同步流程；只有 `Dockerfile` 会构建前端并复制 `dist`。
+- 后端静态资源缓存为 `Cache-Control: max-age=7200, public`，但旧页面根因是服务器使用旧产物，缓存只是次要因素。
+
+### 用户已确认的运行方案
+- 日常开发采用 IDEA 一键同时启动 Spring Boot `8081` 与 Vite `5173`，浏览器默认访问 `http://127.0.0.1:5173/`。
+- `5173` 作为最新前端源码页面，支持热更新；`8081` 在开发时主要提供 API 和 `/images`。
+- 毕业答辩前再执行正式前端构建，把新的 `dist` 同步到后端 static，重新构建后以单端口 `8081` 演示。
+- 计划使用三个 IDEA 配置：
+  - `Flower Backend - Dev`
+  - `Flower Frontend - Dev`
+  - `Flower Full Stack - Dev`（Compound，一键启动前后端）
+- 根目录使用文档 `IDEA启动与前端同步使用方案.md` 已写好，包含 IDEA 配置字段、日常开发、DIY 核对、答辩打包、资源哈希验证、缓存和故障排查。
+
+### 新对话的精确下一步
+1. 先完整阅读根目录 `AGENTS.md`、`CONTEXT.md` 和 `IDEA启动与前端同步使用方案.md`。
+2. 先检查当前 Git 工作区并保留上述两个未提交文档变更，不得覆盖或丢弃。
+3. 通过 IDEA MCP 检查当前运行配置和 `.idea`/共享 `.run` 配置格式，提出“实际创建一键启动配置”的最小实施方案，得到用户确认后再修改。
+4. 获批后创建并验证 `Flower Backend - Dev`、`Flower Frontend - Dev` 和 `Flower Full Stack - Dev`；Vite 使用现有本地依赖，不安装或下载任何资源。
+5. 必须通过 IDEA MCP 实际一键启动，确认 `8081` 后端可用、`5173` 自动打开并加载 `/@vite/client`、`/src/main.js`，再截图验证 `/user/diy` 为 `DiyPageMigrated.vue` 迁移版。
+6. 本步骤不要构建或复制 `dist`、不要清理后端 static、不要改数据库、不要重做全站美化。
+7. 完成实际配置和自测后，再更新本文件；检查敏感信息后，按 `AGENTS.md` 和用户授权决定是否提交推送。
+
+## 2026-08-01（IDEA 运行链路与旧 DIY 来源诊断）
+
+### 本轮结论
+- 本轮只做只读诊断和临时运行验证，未修改前端/后端源码、未构建复制 `dist`、未改数据库、未提交或推送代码。
+- IDEA MCP 当前项目包含 `flower-frontend` 源码模块和 `flower-web` 后端模块；发现两个同名 `FlowerApplication` 运行配置，分别显示为 Spring Boot 配置和 Java 配置，没有独立 Vite 运行配置。
+- 通过 IDEA MCP 启动的 Spring Boot 实际入口为 `com.flower.FlowerApplication`，日志显示从 `flower-web/target/classes` 启动，注册 `classpath resource [static/index.html]`，监听 `8081`。
+- `http://127.0.0.1:5173/` 初始没有运行；临时启动 Vite 后，页面实际由 `/@vite/client`、`/src/main.js` 和源码模块提供，DIY 路由显示 `DiyPageMigrated.vue` 的 `DIY BOUQUET` 迁移版。
+- `http://127.0.0.1:8081/` 实际返回 `flower-web/src/main/resources/static/index.html` 中固定的 `/assets/index-BsFUSw8F.js` 和 `/assets/index-BMJU6sKl.css`；截图和运行文本确认该资源加载的是旧 `DiyPage.vue`，显示旧版“选择花卉/花束设计区”页面。
+- 当前 `flower-frontend/dist` 不存在；后端源码 static 与 `flower-web/target/classes/static` 的 `index.html`、旧 JS 文件 SHA-256 一致，均为 2026-06-09 的旧构建产物。静态资源响应头为 `Cache-Control: max-age=7200, public`，但本次差异的根因是 8081 本身指向旧产物，不是单纯浏览器缓存。
+- `flower-frontend/vite.config.js` 只配置了 `5173` 以及 `/api`、`/images` 到 `8081` 的代理；Maven POM 未发现前端构建或 `dist` 复制流程。唯一明确的前端打包复制流程在 `Dockerfile`：Docker 阶段执行 `npm run build`，再把 `/app/frontend/dist` 复制到 `flower-web/src/main/resources/static/`。
+- 临时 Vite、专用 Chrome 和两张诊断截图已停止/删除；Spring Boot 的 IDEA 进程保留在 `8081`，5173 已停止。截图证据已在本轮对话中展示。
+
+### 后续建议
+- 日常开发统一访问 `http://127.0.0.1:5173/`，将 Spring Boot `8081` 作为 API 和图片代理服务。
+- 毕业答辩或单端口演示时，先执行前端构建，再把新的 `dist` 同步到后端 static 并重新启动 Spring Boot；后续可增加一个简单的本地同步脚本，但本轮不执行。
+- 后续前端页面优化仍按单页面、小范围、先给设计方向并获确认后修改；修改后同时核对 5173 与 8081 的实际资源和页面。
+
+### IDEA 使用方案文档
+- 已在项目根目录新增 `IDEA启动与前端同步使用方案.md`，记录 IDEA 后端、Vite 和 Compound 一键启动配置，以及开发模式和答辩打包模式的完整使用方法。
+- 文档明确日常开发访问 `5173`、答辩打包访问同步后的 `8081`，并包含 DIY 路由核对、构建产物同步、哈希资源验证、浏览器缓存和常见故障排查。
+- 本轮只新增使用文档并更新上下文，没有修改业务源码、构建产物、数据库或 IDEA 配置，也没有提交和推送。
+
 ## 2026-08-01（前端回退完成，新对话交接）
 
 ### 当前版本状态

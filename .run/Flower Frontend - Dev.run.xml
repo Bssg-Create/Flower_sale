@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Flower Frontend - Dev" type="js.build_tools.npm" factoryName="npm">
+    <package-json value="$PROJECT_DIR$/flower-frontend/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="dev" />
+    </scripts>
+    <arguments value="-- --host 127.0.0.1 --open" />
+    <node-interpreter value="project" />
+    <envs />
+    <method v="2" />
+  </configuration>
+</component>

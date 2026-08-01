@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Flower Backend - Dev" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="flower-web" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.flower.FlowerApplication" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
