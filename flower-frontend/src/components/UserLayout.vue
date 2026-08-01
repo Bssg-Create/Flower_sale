@@ -2,22 +2,22 @@
   <div class="user-layout">
     <header class="header">
       <div class="header-left">
-        <span class="logo-icon">🌸</span>
+        <span class="logo-icon">花</span>
         <span class="logo-text">花卉销售系统</span>
       </div>
       <nav class="nav">
         <router-link to="/user/home" :class="['nav-link', { active: $route.path === '/user/home' }]">
-          🏠 首页
+          花店首页
         </router-link>
         <router-link to="/user/diy" :class="['nav-link', { active: $route.path === '/user/diy' }]">
-          🎨 DIY花束
+          DIY 花束
         </router-link>
         <router-link to="/user/plans" :class="['nav-link', { active: $route.path.startsWith('/user/plan') }]">
-          📋 DIY花束方案
+          我的方案
         </router-link>
       </nav>
       <div class="header-right">
-        <span class="user-info">👤 {{ username }}</span>
+        <span class="user-info"><small>当前用户</small>{{ username }}</span>
         <button class="logout-btn" @click="handleLogout">退出登录</button>
       </div>
     </header>
@@ -56,79 +56,137 @@ const handleLogout = () => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+  background: var(--color-canvas);
 }
 
 .header {
-  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-  color: white;
-  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  min-height: 72px;
+  color: var(--color-ink);
+  padding: 0.7rem clamp(1rem, 4vw, 3rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  gap: 1.25rem;
+  border-bottom: 1px solid rgba(49, 79, 70, 0.1);
+  background: rgba(248, 250, 247, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.3rem;
-  font-weight: bold;
+  gap: 0.7rem;
+  font-size: 1.05rem;
+  font-weight: 750;
+  white-space: nowrap;
 }
 
 .logo-icon {
-  font-size: 1.8rem;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #ffffff;
+  background: var(--color-forest);
+  font-size: 0.95rem;
 }
 
 .nav {
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--color-surface-soft);
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-ink-soft);
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  transition: all 0.3s;
+  padding: 0.55rem 0.9rem;
+  border-radius: 9px;
+  font-size: 0.9rem;
+  font-weight: 650;
+  white-space: nowrap;
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-brand-strong);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .nav-link.active {
-  background: white;
-  color: #c44569;
+  color: var(--color-brand-strong);
+  background: var(--color-surface);
+  box-shadow: 0 5px 14px rgba(42, 70, 61, 0.08);
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .user-info {
-  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: var(--color-ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.user-info small {
+  color: var(--color-muted);
+  font-size: 0.67rem;
+  font-weight: 500;
 }
 
 .logout-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: none;
-  padding: 0.4rem 1rem;
-  border-radius: 15px;
+  color: var(--color-ink-soft);
+  background: transparent;
+  border: 1px solid var(--color-line);
+  padding: 0.48rem 0.78rem;
+  border-radius: 9px;
   cursor: pointer;
-  transition: all 0.3s;
+  font-size: 0.82rem;
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  color: var(--color-brand-strong);
+  border-color: rgba(166, 63, 95, 0.32);
+  background: var(--color-surface-rose);
 }
 
 .content {
   flex: 1;
-  padding: 2rem;
+  padding: clamp(1.2rem, 3vw, 2.5rem);
+}
+
+@media (max-width: 900px) {
+  .header {
+    position: static;
+    flex-wrap: wrap;
+  }
+
+  .nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .nav-link { flex: 1; text-align: center; }
+}
+
+@media (max-width: 560px) {
+  .logo-text { display: none; }
+  .user-info small { display: none; }
+  .content { padding: 0.85rem; }
 }
 </style>

@@ -3,35 +3,35 @@
     <div class="content-header">
       <h2>{{ currentTitle }}</h2>
       <div class="header-actions">
-        <button class="refresh-btn" @click="refreshData">🔄 刷新</button>
+        <button class="refresh-btn" @click="refreshData">刷新数据</button>
       </div>
     </div>
 
     <div v-if="$route.path === '/admin'" class="dashboard">
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-icon">👥</div>
+          <div class="stat-icon">人</div>
           <div class="stat-info">
             <span class="stat-value">{{ stats.users }}</span>
             <span class="stat-label">用户总数</span>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🌸</div>
+          <div class="stat-icon">花</div>
           <div class="stat-info">
             <span class="stat-value">{{ stats.flowers }}</span>
             <span class="stat-label">花卉种类</span>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🛒</div>
+          <div class="stat-icon">单</div>
           <div class="stat-info">
             <span class="stat-value">{{ stats.orders }}</span>
             <span class="stat-label">订单数量</span>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🎨</div>
+          <div class="stat-icon">创</div>
           <div class="stat-info">
             <span class="stat-value">{{ stats.diy }}</span>
             <span class="stat-label">DIY花束</span>
@@ -42,7 +42,7 @@
 
     <div v-if="$route.path === '/admin/users'" class="data-section">
       <div class="toolbar">
-        <input v-model="userSearch" type="text" class="search-input" placeholder="搜索用户名..." @input="filterUsers" />
+        <input v-model="userSearch" type="search" class="search-input" placeholder="搜索用户名或手机号" aria-label="搜索用户" />
       </div>
       <table class="table">
         <thead>
@@ -84,7 +84,7 @@
 
     <div v-if="$route.path === '/admin/flowers'" class="data-section">
       <div class="toolbar">
-        <input v-model="flowerSearch" type="text" class="search-input" placeholder="搜索花卉..." />
+        <input v-model="flowerSearch" type="search" class="search-input" placeholder="搜索花卉名称或分类" aria-label="搜索花卉" />
         <button class="add-btn" @click="showFlowerForm = true">+ 新增花卉</button>
       </div>
 
@@ -118,7 +118,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="f in flowers" :key="f.id">
+          <tr v-for="f in filteredFlowers" :key="f.id">
             <td>{{ f.id }}</td>
             <td>{{ f.name }}</td>
             <td>{{ f.categoryName }}</td>
@@ -229,7 +229,16 @@ const editFlower = ref({})
 
 const filteredUsers = computed(() => {
   if (!userSearch.value) return users.value
-  return users.value.filter(u => u.username?.includes(userSearch.value) || u.phone?.includes(userSearch.value))
+  const keyword = userSearch.value.trim().toLowerCase()
+  return users.value.filter(u => u.username?.toLowerCase().includes(keyword) || u.phone?.includes(keyword))
+})
+
+const filteredFlowers = computed(() => {
+  if (!flowerSearch.value) return flowers.value
+  const keyword = flowerSearch.value.trim().toLowerCase()
+  return flowers.value.filter(f =>
+    f.name?.toLowerCase().includes(keyword) || f.categoryName?.toLowerCase().includes(keyword)
+  )
 })
 
 const getStatusText = (s) => {
@@ -309,38 +318,44 @@ watch(() => route.path, () => { if (route.path.startsWith('/admin')) loadData() 
 </script>
 
 <style scoped>
-.admin-dashboard { max-width: 100%; }
+.admin-dashboard { width: 100%; max-width: 1480px; margin: 0 auto; }
 
 .content-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
-.content-header h2 { color: #333; font-size: 1.4rem; }
+.content-header h2 { color: var(--color-ink); font-size: clamp(1.35rem, 2vw, 1.7rem); }
 
 .refresh-btn, .add-btn, .cancel-btn, .save-btn {
-  padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer;
+  padding: 0.58rem 0.9rem; border: 1px solid transparent; border-radius: var(--radius-control); cursor: pointer;
   font-size: 0.9rem;
+  font-weight: 650;
+  transition: all var(--ease-standard);
 }
 
-.refresh-btn { background: #f0f0f0; color: #666; }
-.add-btn, .save-btn { background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%); color: white; }
-.cancel-btn { background: #f0f0f0; color: #666; }
+.refresh-btn { background: var(--color-surface); color: var(--color-ink-soft); border-color: var(--color-line); }
+.refresh-btn:hover { border-color: var(--color-brand-line); color: var(--color-brand); }
+.add-btn, .save-btn { background: var(--color-brand); color: white; }
+.add-btn:hover, .save-btn:hover { background: var(--color-brand-strong); }
+.cancel-btn { background: var(--color-surface-soft); color: var(--color-muted); border-color: var(--color-line); }
 
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
-.stat-card { background: white; border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-.stat-icon { font-size: 2rem; }
-.stat-value { font-size: 1.8rem; font-weight: bold; color: #333; display: block; }
-.stat-label { color: #888; font-size: 0.85rem; }
+.stat-card { min-height: 124px; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-card); padding: 1.25rem; display: flex; align-items: center; gap: 1rem; box-shadow: var(--shadow-soft); }
+.stat-card:nth-child(2n) .stat-icon { color: var(--color-forest); background: var(--color-forest-soft); }
+.stat-icon { width: 46px; height: 46px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 13px; color: var(--color-brand); background: var(--color-brand-soft); font-family: Georgia, "Times New Roman", serif; font-size: 1.05rem; font-weight: 700; }
+.stat-value { font-size: 1.8rem; font-weight: 760; color: var(--color-ink); display: block; font-variant-numeric: tabular-nums; }
+.stat-label { color: var(--color-muted); font-size: 0.82rem; }
 
-.data-section { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-.toolbar { display: flex; gap: 1rem; margin-bottom: 1rem; }
-.search-input { padding: 0.5rem 1rem; border: 1px solid #e0e0e0; border-radius: 8px; width: 250px; outline: none; }
-.search-input:focus { border-color: #c44569; }
+.data-section { overflow-x: auto; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-card); padding: clamp(1rem, 2vw, 1.5rem); box-shadow: var(--shadow-soft); }
+.toolbar { display: flex; gap: 0.75rem; margin-bottom: 1.1rem; }
+.search-input { padding: 0.62rem 0.85rem; border: 1px solid var(--color-line); border-radius: var(--radius-control); width: min(100%, 300px); outline: none; background: var(--color-surface-soft); }
+.search-input:focus { border-color: var(--color-brand); background: var(--color-surface); box-shadow: 0 0 0 3px rgba(166, 63, 95, 0.08); }
 
-.table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-.table th { text-align: left; padding: 0.7rem; background: #fafafa; color: #666; border-bottom: 2px solid #eee; }
-.table td { padding: 0.7rem; border-bottom: 1px solid #f0f0f0; }
+.table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 0.88rem; }
+.table th { text-align: left; padding: 0.78rem; background: var(--color-surface-soft); color: var(--color-muted); border-bottom: 1px solid var(--color-line); font-size: 0.78rem; font-weight: 700; }
+.table td { padding: 0.82rem 0.78rem; color: var(--color-ink-soft); border-bottom: 1px solid var(--color-line); }
+.table tbody tr:hover { background: #fafcf9; }
 
 .badge { padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.8rem; }
 .badge-admin { background: #fff7e6; color: #fa8c16; }
@@ -351,20 +366,30 @@ watch(() => route.path, () => { if (route.path.startsWith('/admin')) loadData() 
 .badge-info { background: #e6f7ff; color: #1890ff; }
 .badge-primary { background: #f0f5ff; color: #597ef7; }
 
-.action-btn { padding: 0.3rem 0.7rem; border: 1px solid #e0e0e0; border-radius: 6px; background: white; cursor: pointer; font-size: 0.8rem; margin-right: 0.3rem; }
-.action-btn:hover { border-color: #c44569; color: #c44569; }
+.action-btn { padding: 0.38rem 0.65rem; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface); cursor: pointer; font-size: 0.78rem; margin-right: 0.3rem; }
+.action-btn:hover { border-color: var(--color-brand); color: var(--color-brand); }
 .action-btn.danger:hover { border-color: #ff4d4f; color: #ff4d4f; }
 
-.status-select { padding: 0.3rem; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 0.8rem; }
+.status-select { padding: 0.4rem; border: 1px solid var(--color-line); border-radius: 8px; font-size: 0.8rem; }
 
-.form-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 100; }
-.form-card { background: white; border-radius: 12px; padding: 2rem; width: 500px; }
+.form-overlay { position: fixed; inset: 0; padding: 1rem; background: rgba(27, 43, 38, 0.54); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.form-card { background: var(--color-surface); border-radius: var(--radius-card); padding: clamp(1.25rem, 3vw, 2rem); width: min(100%, 520px); box-shadow: var(--shadow-lifted); }
 .form-card h3 { margin-bottom: 1rem; }
 .form-group { margin-bottom: 0.8rem; }
-.form-group label { display: block; margin-bottom: 0.3rem; color: #555; font-size: 0.85rem; }
-.form-group input, .form-group textarea { width: 100%; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.9rem; outline: none; }
-.form-group input:focus, .form-group textarea:focus { border-color: #c44569; }
+.form-group label { display: block; margin-bottom: 0.35rem; color: var(--color-muted); font-size: 0.82rem; font-weight: 650; }
+.form-group input, .form-group textarea { width: 100%; padding: 0.62rem; border: 1px solid var(--color-line); border-radius: var(--radius-control); font-size: 0.9rem; outline: none; }
+.form-group input:focus, .form-group textarea:focus { border-color: var(--color-brand); }
 .form-row { display: flex; gap: 1rem; }
 .form-row .form-group { flex: 1; }
 .form-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+@media (max-width: 980px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+  .content-header { align-items: flex-start; }
+  .stats-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+  .stat-card { min-height: 98px; }
+  .toolbar, .form-row { flex-direction: column; }
+  .search-input { width: 100%; }
+}
 </style>
