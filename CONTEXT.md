@@ -1,5 +1,29 @@
 # 项目上下文记录
 
+## 2026-08-04（开启新对话：数据库安全迁移最终交接）
+
+### 最终状态
+- 项目路径：`D:\GProject\flower_trae\flower-sales`；分支：`master`；远端：`https://github.com/Bssg-Create/Flower_sale.git`。
+- 数据库最小权限迁移交接提交为 `c1b93c5ad5fe086b3a8611d054152b892974d67f`（`Record database privilege migration`），已推送到 `origin/master`；写入本节前工作区干净且 `HEAD` 与 `origin/master` 一致。本次新对话交接提交完成后，以新对话提示词中的最终 `HEAD` 为准。
+- `flower_app@localhost` 已创建，仅拥有 `flower_sales.*` 的 `SELECT、INSERT、UPDATE、DELETE`；没有 DDL、全局权限、其他 Schema 权限或 `GRANT OPTION`。
+- 新 JWT、`flower_app` 密码和管理员密码均为系统加密随机值，真实值没有落盘、输出或进入 Git。管理员旧密码已失效，新密码登录成功，数据库保存 BCrypt 哈希。
+- MySQL `root` 密码没有修改；root 轮换会影响 Workbench 和其他项目，后续仍必须作为独立操作重新说明影响并获得明确许可。
+- 订单、库存、DIY 等业务数据未修改；最终数量为用户 10、订单 3、订单明细 7、DIY 方案 12、DIY 明细 56、花材 13。
+- 离线编译、测试、真实 API、日志脱敏、敏感扫描和临时资源清理均通过；8081、18081、5173、28081 最终均未监听。
+- 没有修改前端视觉、路由、接口字段、业务流程或 `dist`；DIY 拖拽、旋转缩放、包装、模板、一键整理、保存、详情还原和直接下单能力完整保留。
+
+### 本机剪贴板与用户必须完成的操作
+- 最终交接检查确认剪贴板格式仍有效，包含 IDEA `Flower Backend - Dev` 所需的 `FLOWER_JWT_SECRET`、`SPRING_DATASOURCE_USERNAME=flower_app`、`SPRING_DATASOURCE_PASSWORD`，以及管理员新密码；真实值不得写入本文件、聊天、日志、代码或 Git。
+- 用户尚未确认已经保存这些值。新对话第一步必须先提醒用户：把环境变量粘贴到 IDEA `Flower Backend - Dev`，把管理员新密码保存到密码管理工具。
+- 如果剪贴板在用户保存前被覆盖，无法从数据库反推出随机应用密码；必须再次获得用户许可后，用 root 安全轮换 `flower_app` 密码并生成新的剪贴板内容，不能猜测或把凭据写入仓库。
+
+### 新对话精确下一步
+1. 完整阅读根目录 `AGENTS.md`、`CONTEXT.md` 和 `IDEA启动与前端同步使用方案.md`，核对 `master`、最终 `HEAD`、`origin/master` 和工作区；不得恢复 `92b5b80`。
+2. 先询问并确认用户是否已经把剪贴板中的 IDEA 环境变量和管理员密码分别保存妥当；不要要求用户把真实值发到聊天中。
+3. 用户确认保存后，使用 IDEA `Flower Full Stack - Dev` 启动项目，访问 `http://127.0.0.1:5173/`，验证新管理员密码登录、普通用户登录、订单中心和 DIY 保存/详情还原/直接下单核心链路；验证时不得输出真实凭据。
+4. 启动验证结束后停止 8081/5173 服务，清理临时数据和日志，复查业务数量及敏感信息，更新本文件并按规则提交推送。
+5. 不主动修改 root 密码、不修改前端视觉或业务流程、不构建或同步 `dist`、不下载新依赖；任何新方案或 root 轮换都必须先获得明确许可。
+
 ## 2026-08-04（数据库最小权限迁移与本机凭据轮换完成）
 
 ### 授权、范围与 Git 起点
