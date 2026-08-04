@@ -3,6 +3,7 @@ package com.flower.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -15,6 +16,8 @@ public class Order {
     private Long id;
     private String orderNo;
     private Long userId;
+    @JsonIgnore
+    private Long diyBouquetId;
     private BigDecimal totalAmount;
     private String status;
     private String payStatus;

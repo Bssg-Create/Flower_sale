@@ -12,6 +12,9 @@
         <router-link to="/user/diy" :class="['nav-link', { active: $route.path === '/user/diy' }]">
           DIY花束
         </router-link>
+        <router-link to="/user/orders" :class="['nav-link', { active: $route.path === '/user/orders' }]">
+          我的订单
+        </router-link>
         <router-link to="/user/plans" :class="['nav-link', { active: $route.path.startsWith('/user/plan') }]">
           DIY花束方案
         </router-link>

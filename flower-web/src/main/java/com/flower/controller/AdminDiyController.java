@@ -4,6 +4,8 @@ import com.flower.base.ResponseResult;
 import com.flower.config.AuthContext;
 import com.flower.entity.DiyBouquet;
 import com.flower.entity.User;
+import com.flower.enums.DiyBouquetStatus;
+import com.flower.exception.BaseException;
 import com.flower.service.DiyBouquetService;
 import com.flower.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -67,11 +69,22 @@ public class AdminDiyController {
         try {
             DiyBouquet bouquet = diyBouquetService.getBouquetById(id);
             if (bouquet == null) {
-                return ResponseResult.error("花束方案不存在");
+                throw new BaseException(404, "花束方案不存在");
             }
-            bouquet.setStatus(params.get("status"));
-            boolean ok = diyBouquetService.updateBouquet(bouquet);
-            return ResponseResult.success(ok);
+            DiyBouquetStatus currentStatus;
+            DiyBouquetStatus targetStatus;
+            try {
+                currentStatus = DiyBouquetStatus.fromCode(bouquet.getStatus());
+                targetStatus = DiyBouquetStatus.fromCode(params.get("status"));
+            } catch (IllegalArgumentException e) {
+                throw new BaseException(400, e.getMessage());
+            }
+            if (currentStatus != targetStatus) {
+                throw new BaseException(409, "DIY状态只能由保存和下单流程维护");
+            }
+            return ResponseResult.success(true);
+        } catch (BaseException e) {
+            throw e;
         } catch (Exception e) {
             log.error("AdminDiyController.updateStatus error", e);
             return ResponseResult.error(e.getMessage());

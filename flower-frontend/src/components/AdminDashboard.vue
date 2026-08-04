@@ -149,19 +149,18 @@
               <span :class="['badge', 'badge-' + getStatusClass(o.status)]">{{ getStatusText(o.status) }}</span>
             </td>
             <td>
-              <span :class="['badge', o.payStatus === '1' ? 'badge-active' : 'badge-disabled']">
-                {{ o.payStatus === '1' ? '已支付' : '未支付' }}
+              <span :class="['badge', getPayStatusClass(o.payStatus)]">
+                {{ paymentStatusText(o.payStatus) }}
               </span>
             </td>
             <td>
-              <select v-model="o._newStatus" @change="updateOrderStatus(o)" class="status-select">
+              <select v-if="getAdminActions(o).length" v-model="o._newStatus" @change="updateOrderStatus(o)" class="status-select">
                 <option value="">选择状态</option>
-                <option value="PENDING">待支付</option>
-                <option value="PAID">已支付</option>
-                <option value="SHIPPED">已发货</option>
-                <option value="COMPLETED">已完成</option>
-                <option value="CANCELED">已取消</option>
+                <option v-for="action in getAdminActions(o)" :key="action.value" :value="action.value">
+                  {{ action.label }}
+                </option>
               </select>
+              <span v-else class="no-action">无可用操作</span>
             </td>
           </tr>
         </tbody>
@@ -183,8 +182,8 @@
             <td>¥{{ (d.totalPrice || 0).toFixed(2) }}</td>
             <td>{{ d.packageType || '-' }}</td>
             <td>
-              <span :class="['badge', d.status === '1' ? 'badge-info' : 'badge-active']">
-                {{ d.status === '1' ? '已保存' : d.status === '2' ? '已下单' : (d.status || '-') }}
+              <span :class="['badge', isDiyOrdered(d.status) ? 'badge-active' : 'badge-info']">
+                {{ diyStatusText(d.status) }}
               </span>
             </td>
             <td>{{ d.createTime || '-' }}</td>
@@ -202,6 +201,16 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../api'
+import {
+  ORDER_STATUS,
+  PAYMENT_STATUS,
+  diyStatusText,
+  isDiyOrdered,
+  normalizeOrderStatus,
+  normalizePaymentStatus,
+  orderStatusText,
+  paymentStatusText
+} from '../constants/businessStatus'
 
 const route = useRoute()
 const router = useRouter()
@@ -233,13 +242,34 @@ const filteredUsers = computed(() => {
 })
 
 const getStatusText = (s) => {
-  const m = { PENDING: '待支付', PAID: '已支付', SHIPPED: '已发货', COMPLETED: '已完成', CANCELED: '已取消' }
-  return m[s] || s
+  return orderStatusText(s)
 }
 
 const getStatusClass = (s) => {
-  const m = { PENDING: 'warning', PAID: 'info', SHIPPED: 'primary', COMPLETED: 'active', CANCELED: 'disabled' }
-  return m[s] || ''
+  const m = { pending: 'warning', paid: 'info', shipped: 'primary', completed: 'active', canceled: 'disabled' }
+  return m[normalizeOrderStatus(s)] || 'disabled'
+}
+
+const getPayStatusClass = (s) => {
+  const status = normalizePaymentStatus(s)
+  if (status === PAYMENT_STATUS.PAID) return 'badge-active'
+  if (status === PAYMENT_STATUS.REFUNDED) return 'badge-info'
+  return 'badge-disabled'
+}
+
+const getAdminActions = (order) => {
+  const status = normalizeOrderStatus(order.status)
+  const payStatus = normalizePaymentStatus(order.payStatus)
+  if (status === ORDER_STATUS.PENDING && payStatus === PAYMENT_STATUS.UNPAID) {
+    return [{ value: ORDER_STATUS.CANCELED, label: '取消订单' }]
+  }
+  if (status === ORDER_STATUS.PAID && payStatus === PAYMENT_STATUS.PAID) {
+    return [
+      { value: ORDER_STATUS.SHIPPED, label: '确认发货' },
+      { value: ORDER_STATUS.CANCELED, label: '取消订单' }
+    ]
+  }
+  return []
 }
 
 const loadData = async () => {

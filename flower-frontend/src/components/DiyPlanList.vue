@@ -33,7 +33,7 @@
           </div>
           <div class="plan-actions" @click.stop>
             <button class="btn-preview" @click="viewPlan(plan.id)">查看详情</button>
-            <button class="btn-delete" @click="deletePlan(plan.id)">删除</button>
+            <button v-if="!isDiyOrdered(plan.status)" class="btn-delete" @click="deletePlan(plan.id)">删除</button>
           </div>
         </div>
       </article>
@@ -45,6 +45,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api/index.js'
+import { diyStatusText, isDiyOrdered } from '../constants/businessStatus.js'
 
 const router = useRouter()
 const plans = ref([])
@@ -57,9 +58,7 @@ const previewFlowers = [
 const previewImage = (name) => `/images/diy/${name}`
 
 const statusText = (s) => {
-  if (s === 'ordered') return '已下单'
-  if (s === 'saved' || s === '1') return '已保存'
-  return '草稿'
+  return diyStatusText(s)
 }
 
 const formatTime = (t) => {

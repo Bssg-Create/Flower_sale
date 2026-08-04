@@ -96,8 +96,9 @@ CREATE TABLE IF NOT EXISTS orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
     order_no VARCHAR(50) NOT NULL UNIQUE COMMENT '订单编号',
     user_id BIGINT NOT NULL COMMENT '用户ID',
+    diy_bouquet_id BIGINT NULL COMMENT 'DIY花束方案ID',
     total_amount DECIMAL(10,2) NOT NULL COMMENT '订单总额',
-    status VARCHAR(20) DEFAULT 'pending' COMMENT '订单状态(pending/payed/shipped/completed/canceled)',
+    status VARCHAR(20) DEFAULT 'pending' COMMENT '订单状态(pending/paid/shipped/completed/canceled)',
     pay_status VARCHAR(20) DEFAULT 'unpaid' COMMENT '支付状态(unpaid/paid/refunded)',
     shipping_address VARCHAR(500) COMMENT '收货地址',
     receiver_name VARCHAR(50) COMMENT '收货人姓名',
@@ -107,6 +108,7 @@ CREATE TABLE IF NOT EXISTS orders (
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_order_no (order_no),
     INDEX idx_user_id (user_id),
+    UNIQUE INDEX uk_orders_diy_bouquet_id (diy_bouquet_id),
     INDEX idx_status (status),
     INDEX idx_create_time (create_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';
@@ -136,7 +138,7 @@ CREATE TABLE IF NOT EXISTS diy_bouquet (
     package_type VARCHAR(50) COMMENT '包装类型',
     total_price DECIMAL(10,2) DEFAULT 0 COMMENT '总价',
     image_url VARCHAR(500) COMMENT '效果图URL',
-    status VARCHAR(20) DEFAULT 'draft' COMMENT '状态(draft/saved/submitted)',
+    status VARCHAR(20) DEFAULT 'saved' COMMENT '状态(saved/ordered)',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_user_id (user_id),

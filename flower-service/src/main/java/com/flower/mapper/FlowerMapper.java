@@ -15,4 +15,7 @@ public interface FlowerMapper extends BaseMapper<Flower> {
     @Update("UPDATE flower SET stock = stock - #{quantity}, update_time = CURRENT_TIMESTAMP " +
         "WHERE id = #{id} AND status = '1' AND stock >= #{quantity}")
     int decreaseStockIfEnough(@Param("id") Long id, @Param("quantity") Integer quantity);
+
+    @Update("UPDATE flower SET stock = stock + #{quantity}, update_time = CURRENT_TIMESTAMP WHERE id = #{id}")
+    int increaseStock(@Param("id") Long id, @Param("quantity") Integer quantity);
 }

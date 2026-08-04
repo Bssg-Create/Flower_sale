@@ -8,6 +8,7 @@ import com.flower.entity.Flower;
 import com.flower.entity.Order;
 import com.flower.entity.OrderItem;
 import com.flower.entity.PackageType;
+import com.flower.enums.DiyBouquetStatus;
 import com.flower.exception.BaseException;
 import com.flower.mapper.DiyBouquetItemMapper;
 import com.flower.mapper.DiyBouquetMapper;
@@ -77,7 +78,7 @@ public class DiyBouquetServiceImpl implements DiyBouquetService {
         bouquet.setTotalPrice(totalPrice);
         bouquet.setCreateTime(LocalDateTime.now());
         bouquet.setUpdateTime(LocalDateTime.now());
-        bouquet.setStatus("1");
+        bouquet.setStatus(DiyBouquetStatus.SAVED.getCode());
         if (diyBouquetMapper.insert(bouquet) != 1) {
             throw new BaseException("DIY花束保存失败");
         }
@@ -110,6 +111,14 @@ public class DiyBouquetServiceImpl implements DiyBouquetService {
     @Override
     @Transactional
     public boolean deleteBouquet(Long id) {
+        DiyBouquet bouquet = diyBouquetMapper.selectById(id);
+        if (bouquet == null) {
+            throw new BaseException(404, "花束方案不存在");
+        }
+        DiyBouquetStatus status = parseStatus(bouquet);
+        if (status == DiyBouquetStatus.ORDERED) {
+            throw new BaseException(409, "已下单的花束方案不能删除");
+        }
         LambdaQueryWrapper<DiyBouquetItem> itemWrapper = new LambdaQueryWrapper<>();
         itemWrapper.eq(DiyBouquetItem::getBouquetId, id);
         diyBouquetItemMapper.delete(itemWrapper);
@@ -140,16 +149,20 @@ public class DiyBouquetServiceImpl implements DiyBouquetService {
         if (!Objects.equals(userId, bouquet.getUserId())) {
             throw new BaseException(403, "无权操作他人的花束方案");
         }
-        if ("ordered".equals(bouquet.getStatus())) {
+        DiyBouquetStatus status = parseStatus(bouquet);
+        if (status == DiyBouquetStatus.ORDERED) {
             throw new BaseException(409, "花束方案已下单");
+        }
+        if (status != DiyBouquetStatus.SAVED) {
+            throw new BaseException(409, "当前花束方案状态不允许下单");
         }
 
         LocalDateTime now = LocalDateTime.now();
         LambdaUpdateWrapper<DiyBouquet> claimWrapper = new LambdaUpdateWrapper<>();
         claimWrapper.eq(DiyBouquet::getId, bouquetId)
             .eq(DiyBouquet::getUserId, userId)
-            .and(wrapper -> wrapper.isNull(DiyBouquet::getStatus).or().ne(DiyBouquet::getStatus, "ordered"))
-            .set(DiyBouquet::getStatus, "ordered")
+            .in(DiyBouquet::getStatus, DiyBouquetStatus.SAVED.getCode(), "1")
+            .set(DiyBouquet::getStatus, DiyBouquetStatus.ORDERED.getCode())
             .set(DiyBouquet::getUpdateTime, now);
         if (diyBouquetMapper.update(null, claimWrapper) != 1) {
             throw new BaseException(409, "花束方案状态已变化，请刷新后重试");
@@ -166,8 +179,8 @@ public class DiyBouquetServiceImpl implements DiyBouquetService {
             return orderItem;
         }).toList();
 
-        Order order = orderService.createDiyOrder(userId, orderItems, bouquet.getPackageType(), shippingAddress,
-            receiverName, receiverPhone);
+        Order order = orderService.createDiyOrder(userId, bouquetId, orderItems, bouquet.getPackageType(),
+            shippingAddress, receiverName, receiverPhone);
         DiyBouquet priceUpdate = new DiyBouquet();
         priceUpdate.setId(bouquetId);
         priceUpdate.setTotalPrice(order.getTotalAmount());
@@ -195,5 +208,13 @@ public class DiyBouquetServiceImpl implements DiyBouquetService {
             throw new BaseException(message);
         }
         return price;
+    }
+
+    private DiyBouquetStatus parseStatus(DiyBouquet bouquet) {
+        try {
+            return DiyBouquetStatus.fromCode(bouquet.getStatus());
+        } catch (IllegalArgumentException e) {
+            throw new BaseException(409, "DIY花束状态数据异常");
+        }
     }
 }

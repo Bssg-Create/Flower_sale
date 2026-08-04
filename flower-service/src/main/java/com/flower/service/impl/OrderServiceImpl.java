@@ -5,6 +5,8 @@ import com.flower.entity.Flower;
 import com.flower.entity.Order;
 import com.flower.entity.OrderItem;
 import com.flower.entity.PackageType;
+import com.flower.enums.OrderStatus;
+import com.flower.enums.PaymentStatus;
 import com.flower.exception.BaseException;
 import com.flower.mapper.FlowerMapper;
 import com.flower.mapper.OrderItemMapper;
@@ -40,19 +42,22 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order createOrder(Long userId, List<OrderItem> items, String shippingAddress, String receiverName, String receiverPhone) {
-        return createOrderInternal(userId, items, BigDecimal.ZERO, shippingAddress, receiverName, receiverPhone);
+        return createOrderInternal(userId, null, items, BigDecimal.ZERO, shippingAddress, receiverName, receiverPhone);
     }
 
     @Override
     @Transactional
-    public Order createDiyOrder(Long userId, List<OrderItem> items, String packageType, String shippingAddress,
+    public Order createDiyOrder(Long userId, Long diyBouquetId, List<OrderItem> items, String packageType,
+                                String shippingAddress,
                                 String receiverName, String receiverPhone) {
         PackageType selectedPackage = packageTypeService.getEnabledByCompatibleName(packageType);
         BigDecimal packagePrice = requireValidPrice(selectedPackage.getPrice(), "包装价格数据异常");
-        return createOrderInternal(userId, items, packagePrice, shippingAddress, receiverName, receiverPhone);
+        return createOrderInternal(userId, diyBouquetId, items, packagePrice, shippingAddress, receiverName,
+            receiverPhone);
     }
 
-    private Order createOrderInternal(Long userId, List<OrderItem> requestedItems, BigDecimal additionalAmount,
+    private Order createOrderInternal(Long userId, Long diyBouquetId, List<OrderItem> requestedItems,
+                                      BigDecimal additionalAmount,
                                       String shippingAddress, String receiverName, String receiverPhone) {
         if (userId == null || userId <= 0) {
             throw new BaseException(401, "登录状态无效");
@@ -93,9 +98,10 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setOrderNo(UUID.randomUUID().toString().replace("-", "").substring(0, 20));
         order.setUserId(userId);
+        order.setDiyBouquetId(diyBouquetId);
         order.setTotalAmount(totalAmount);
-        order.setStatus("pending");
-        order.setPayStatus("unpaid");
+        order.setStatus(OrderStatus.PENDING.getCode());
+        order.setPayStatus(PaymentStatus.UNPAID.getCode());
         order.setShippingAddress(shippingAddress.trim());
         order.setReceiverName(receiverName.trim());
         order.setReceiverPhone(receiverPhone.trim());
@@ -173,21 +179,130 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean updateOrderStatus(Long id, String status) {
-        Order order = new Order();
-        order.setId(id);
-        order.setStatus(status);
-        order.setUpdateTime(LocalDateTime.now());
-        return orderMapper.updateById(order) > 0;
+    @Transactional
+    public boolean payOrder(Long id) {
+        Order order = requireLockedOrder(id);
+        OrderStatus status = parseOrderStatus(order);
+        PaymentStatus payStatus = parsePaymentStatus(order);
+        if (payStatus == PaymentStatus.PAID &&
+            (status == OrderStatus.PAID || status == OrderStatus.SHIPPED || status == OrderStatus.COMPLETED)) {
+            return true;
+        }
+        if (status != OrderStatus.PENDING || payStatus != PaymentStatus.UNPAID) {
+            throw new BaseException(409, "当前订单状态不允许支付");
+        }
+        return updateState(order, OrderStatus.PAID, PaymentStatus.PAID);
     }
 
     @Override
-    public boolean updatePayStatus(Long id, String payStatus) {
-        Order order = new Order();
-        order.setId(id);
-        order.setPayStatus(payStatus);
-        order.setUpdateTime(LocalDateTime.now());
-        return orderMapper.updateById(order) > 0;
+    @Transactional
+    public boolean cancelOrder(Long id) {
+        Order order = requireLockedOrder(id);
+        OrderStatus status = parseOrderStatus(order);
+        PaymentStatus payStatus = parsePaymentStatus(order);
+        if (status == OrderStatus.CANCELED &&
+            (payStatus == PaymentStatus.UNPAID || payStatus == PaymentStatus.REFUNDED)) {
+            return true;
+        }
+        PaymentStatus canceledPayStatus;
+        if (status == OrderStatus.PENDING && payStatus == PaymentStatus.UNPAID) {
+            canceledPayStatus = PaymentStatus.UNPAID;
+        } else if (status == OrderStatus.PAID && payStatus == PaymentStatus.PAID) {
+            canceledPayStatus = PaymentStatus.REFUNDED;
+        } else {
+            throw new BaseException(409, "当前订单状态不允许取消");
+        }
+        updateState(order, OrderStatus.CANCELED, canceledPayStatus);
+        restoreStock(order.getId());
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean shipOrder(Long id) {
+        Order order = requireLockedOrder(id);
+        OrderStatus status = parseOrderStatus(order);
+        PaymentStatus payStatus = parsePaymentStatus(order);
+        if (status == OrderStatus.SHIPPED && payStatus == PaymentStatus.PAID) {
+            return true;
+        }
+        if (status != OrderStatus.PAID || payStatus != PaymentStatus.PAID) {
+            throw new BaseException(409, "只有已支付订单可以发货");
+        }
+        return updateState(order, OrderStatus.SHIPPED, PaymentStatus.PAID);
+    }
+
+    @Override
+    @Transactional
+    public boolean confirmReceipt(Long id) {
+        Order order = requireLockedOrder(id);
+        OrderStatus status = parseOrderStatus(order);
+        PaymentStatus payStatus = parsePaymentStatus(order);
+        if (status == OrderStatus.COMPLETED && payStatus == PaymentStatus.PAID) {
+            return true;
+        }
+        if (status != OrderStatus.SHIPPED || payStatus != PaymentStatus.PAID) {
+            throw new BaseException(409, "只有已发货订单可以确认收货");
+        }
+        return updateState(order, OrderStatus.COMPLETED, PaymentStatus.PAID);
+    }
+
+    private Order requireLockedOrder(Long id) {
+        Order order = id == null ? null : orderMapper.selectByIdForUpdate(id);
+        if (order == null) {
+            throw new BaseException(404, "订单不存在");
+        }
+        return order;
+    }
+
+    private OrderStatus parseOrderStatus(Order order) {
+        try {
+            return OrderStatus.fromCode(order.getStatus());
+        } catch (IllegalArgumentException e) {
+            throw new BaseException(409, "订单状态数据异常");
+        }
+    }
+
+    private PaymentStatus parsePaymentStatus(Order order) {
+        try {
+            return PaymentStatus.fromCode(order.getPayStatus());
+        } catch (IllegalArgumentException e) {
+            throw new BaseException(409, "支付状态数据异常");
+        }
+    }
+
+    private boolean updateState(Order order, OrderStatus status, PaymentStatus payStatus) {
+        Order update = new Order();
+        update.setId(order.getId());
+        update.setStatus(status.getCode());
+        update.setPayStatus(payStatus.getCode());
+        update.setUpdateTime(LocalDateTime.now());
+        if (orderMapper.updateById(update) != 1) {
+            throw new BaseException(409, "订单状态已变化，请刷新后重试");
+        }
+        return true;
+    }
+
+    private void restoreStock(Long orderId) {
+        Map<Long, Integer> quantities = new TreeMap<>();
+        for (OrderItem item : getOrderItems(orderId)) {
+            if (item.getFlowerId() == null || item.getQuantity() == null || item.getQuantity() <= 0) {
+                throw new BaseException(409, "订单明细数据异常，无法恢复库存");
+            }
+            long restored = (long) quantities.getOrDefault(item.getFlowerId(), 0) + item.getQuantity();
+            if (restored > Integer.MAX_VALUE) {
+                throw new BaseException(409, "订单明细数量异常，无法恢复库存");
+            }
+            quantities.put(item.getFlowerId(), (int) restored);
+        }
+        if (quantities.isEmpty()) {
+            throw new BaseException(409, "订单没有商品明细，无法恢复库存");
+        }
+        for (Map.Entry<Long, Integer> entry : quantities.entrySet()) {
+            if (flowerMapper.increaseStock(entry.getKey(), entry.getValue()) != 1) {
+                throw new BaseException(409, "花材已不存在，无法恢复库存");
+            }
+        }
     }
 
     @Override

@@ -35,7 +35,7 @@
           </div>
         </section>
 
-        <section class="info-card order-section" v-if="plan.status !== 'ordered'">
+        <section class="info-card order-section" v-if="!isDiyOrdered(plan.status)">
           <h3>立即购买</h3>
           <div class="order-form">
             <input v-model="form.receiverName" placeholder="收货人姓名" class="order-input" />
@@ -59,6 +59,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BouquetCanvas from './BouquetCanvas.vue'
 import api from '../api/index.js'
+import { diyStatusText, isDiyOrdered } from '../constants/businessStatus.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -98,9 +99,7 @@ const packageNameMap = {
 }
 
 const statusText = (s) => {
-  if (s === 'ordered') return '已下单'
-  if (s === 'saved' || s === '1') return '已保存'
-  return '草稿'
+  return diyStatusText(s)
 }
 
 const getProfile = (name) => flowerProfiles.find(profile => (name || '').includes(profile.key)) || null

@@ -1,5 +1,46 @@
 # 项目上下文记录
 
+## 2026-08-04（订单、支付、DIY 状态统一与普通用户订单闭环完成）
+
+### 数据库备份与迁移
+- 实施前只读检查确认：订单状态为 `PENDING/unpaid ×2`、`SHIPPED/unpaid ×1`；DIY 状态为 `1 ×11`、`ordered ×1`；`update_order_status` 触发器数量为 0。
+- 用户明确许可后，已把 `orders`、`order_item`、`diy_bouquet`、`diy_bouquet_item`、`flower` 备份到 Git 仓库外：`D:\GProject\flower_trae\flower-sales-local-backups\20260804-120337\flower_sales_order_state_backup.sql`。
+- 备份大小为 16149 字节，SHA-256 为 `7464D74480A582FB964A92ACC06C74346F96E9EBE590DACCDF56B1B09ACBA862`；备份包含用户订单收货数据，禁止移动进 Git 仓库或提交。
+- 实际数据库 `orders` 已新增可空 `diy_bouquet_id BIGINT` 和唯一索引 `uk_orders_diy_bouquet_id`；没有猜测回填历史 DIY 订单关联。
+- 已规范化 3 行订单状态和 11 行 DIY 状态。当前为 `pending/unpaid ×2`、`shipped/unpaid ×1`、`saved ×11`、`ordered ×1`。
+- 历史订单 `id=1` 仍为 `shipped/unpaid` 非法组合，只统一了大小写，没有擅自修改支付语义或库存；前后端均把它视为异常只读状态，后续如要修正必须单独核对历史支付/库存事实并获得许可。
+
+### 统一状态与后端闭环
+- 新增 `OrderStatus`、`PaymentStatus`、`DiyBouquetStatus` 三个枚举，数据库/API 统一使用小写：订单 `pending/paid/shipped/completed/canceled`，支付 `unpaid/paid/refunded`，DIY `saved/ordered`。
+- 订单创建继续在统一事务中立即扣库存，并写入 `pending/unpaid`；模拟支付不再接受任意状态，而是原子推进到 `paid/paid`。
+- 模拟支付仅订单本人可操作；管理员不能代付。重复支付已支付、已发货或已完成订单会幂等成功，其他非法组合返回 HTTP 409。
+- 普通用户新增取消和确认收货接口；管理员状态接口仅允许发货或取消，不能代付、代确认收货或任意改状态。
+- 取消仅允许 `pending/unpaid` 或 `paid/paid`；已支付取消写入 `canceled/refunded`。订单行使用 `SELECT ... FOR UPDATE` 锁定，只有首次取消事务恢复库存，重复/并发取消不会重复增加库存。
+- 管理员只能把 `paid/paid` 推进为 `shipped/paid`；订单本人只能把 `shipped/paid` 推进为 `completed/paid`。已发货/已完成订单不能取消，终态不能重新打开。
+- DIY 保存统一写入 `saved`；只有已保存方案可以下单。DIY 下单订单写入内部 `diy_bouquet_id`，唯一索引和原有方案状态抢占共同防止重复下单。
+- DIY 状态仍由保存/下单业务流程维护；管理员不能任意修改。已下单方案不能删除，避免订单来源记录失效。订单取消后 DIY 保持 `ordered` 和历史关联，不复制订单履约状态，避免双状态漂移。
+
+### 普通用户订单中心与前端兼容
+- 新增 `flower-frontend/src/components/OrderCenter.vue` 和 `/user/orders` 路由，用户导航新增“我的订单”。
+- 页面使用现有 `/order/user/{userId}`、`/order/{id}`、`/order/{id}/items` 和保留的 `{payStatus}` 字段，提供订单列表、详情、模拟支付、取消和确认收货闭环。
+- 新增前端统一状态常量 `flower-frontend/src/constants/businessStatus.js`；管理后台只显示当前合法的发货/取消操作，并正确显示支付和 DIY 状态。
+- 历史非法状态组合会显示异常提示并暂停操作；加载、空态、错误重试、重复提交禁用、桌面与手机布局均已处理。
+- DIY 方案列表和详情统一使用状态常量；已下单方案隐藏删除/下单入口。DIY 拖拽、旋转缩放、包装、模板、一键整理、保存、详情还原和直接下单能力没有削弱或删除。
+- 没有重做前端视觉、没有修改现有下单后的跳转/清空流程、没有执行 `npm run build`、没有生成或同步 `dist`。
+
+### 验证与清理
+- `mvn -q -DskipTests compile`、`mvn -q test`、`mvn -q package -DskipTests` 均通过；没有新增或下载依赖。
+- IDEA 对本轮 18 个 Java/Vue/JS 文件执行错误检查，最终全部为 0 个错误；Impeccable 机械检测返回 `[]`。
+- 真实 8081 API/MySQL 验证通过：订单本人/他人/管理员支付权限、支付幂等、未支付取消、已支付取消与退款状态、两个并发取消请求库存只恢复一次、管理员发货、本人确认收货、完成后取消 409、订单列表/详情权限、DIY 关联、重复下单 409、已下单方案删除 409、DIY 取消库存恢复。
+- 5173 Vite 开发服务真实返回入口、订单中心模块、路由模块、状态常量模块和 `/api` 代理 HTTP 200；订单路由、确认收货调用和订单中心模板均进入模块图。当前会话未暴露浏览器控制所需入口，因此没有截图级页面验收。
+- 测试后数据库恢复原始业务行数：订单 3、订单明细 7、DIY 12、DIY 明细 56、花材 13；`TEMP_USERS=0`、`TEMP_FLOWERS=0`、`TEMP_DIY=0`、`DIY_RELATION_ROWS=0`、`LEGACY_TRIGGER=0`。
+- 8081、5173 均已停止，无测试服务或临时脚本残留。
+
+### 后续边界
+1. JWT 密钥、数据库默认凭据和 `DataInitializer` 固定管理员密码行为仍未处理，继续作为独立安全方案；本轮启动日志还确认 MyBatis stdout 会打印用户查询整行和密码哈希，后续安全方案应一并关闭或脱敏 SQL 参数/结果日志。
+2. 历史 `id=1` 的 `shipped/unpaid` 订单只读保留；修复前需要先核对真实支付、发货和库存事实，不得自动改为 `paid` 或恢复库存。
+3. 当前不构建或同步 `dist`；日常继续运行 IDEA `Flower Full Stack - Dev` 并访问 `http://127.0.0.1:5173/`。
+
 ## 2026-08-04（订单与 DIY 服务端校验及数据一致性第二阶段完成）
 
 ### 当前准确状态

@@ -5,6 +5,8 @@ import com.flower.config.AuthContext;
 import com.flower.dto.OrderCreateRequest;
 import com.flower.entity.Order;
 import com.flower.entity.OrderItem;
+import com.flower.enums.OrderStatus;
+import com.flower.enums.PaymentStatus;
 import com.flower.exception.BaseException;
 import com.flower.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,14 +55,47 @@ public class OrderController {
     public ResponseResult<Boolean> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> params,
                                                 HttpServletRequest request) {
         AuthContext.requireAdmin(request);
-        return ResponseResult.success(orderService.updateOrderStatus(id, params.get("status")));
+        OrderStatus targetStatus;
+        try {
+            targetStatus = OrderStatus.fromCode(params.get("status"));
+        } catch (IllegalArgumentException e) {
+            throw new BaseException(400, e.getMessage());
+        }
+        if (targetStatus == OrderStatus.SHIPPED) {
+            return ResponseResult.success(orderService.shipOrder(id));
+        }
+        if (targetStatus == OrderStatus.CANCELED) {
+            return ResponseResult.success(orderService.cancelOrder(id));
+        }
+        throw new BaseException(409, "管理员只能执行发货或取消订单操作");
     }
 
     @PutMapping("/{id}/pay")
     public ResponseResult<Boolean> updatePayStatus(@PathVariable Long id, @RequestBody Map<String, String> params,
                                                    HttpServletRequest request) {
-        getAuthorizedOrder(id, request);
-        return ResponseResult.success(orderService.updatePayStatus(id, params.get("payStatus")));
+        getOwnedOrder(id, request);
+        PaymentStatus targetStatus;
+        try {
+            targetStatus = PaymentStatus.fromCode(params.get("payStatus"));
+        } catch (IllegalArgumentException e) {
+            throw new BaseException(400, e.getMessage());
+        }
+        if (targetStatus != PaymentStatus.PAID) {
+            throw new BaseException(400, "模拟支付只允许提交paid状态");
+        }
+        return ResponseResult.success(orderService.payOrder(id));
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseResult<Boolean> cancel(@PathVariable Long id, HttpServletRequest request) {
+        getOwnedOrder(id, request);
+        return ResponseResult.success(orderService.cancelOrder(id));
+    }
+
+    @PutMapping("/{id}/confirm")
+    public ResponseResult<Boolean> confirmReceipt(@PathVariable Long id, HttpServletRequest request) {
+        getOwnedOrder(id, request);
+        return ResponseResult.success(orderService.confirmReceipt(id));
     }
 
     @GetMapping("/{id}/items")
@@ -75,6 +110,15 @@ public class OrderController {
             throw new BaseException(404, "订单不存在");
         }
         AuthContext.requireOwnerOrAdmin(request, order.getUserId());
+        return order;
+    }
+
+    private Order getOwnedOrder(Long id, HttpServletRequest request) {
+        Order order = orderService.getOrderById(id);
+        if (order == null) {
+            throw new BaseException(404, "订单不存在");
+        }
+        AuthContext.requireOwner(request, order.getUserId());
         return order;
     }
 }

@@ -5,6 +5,7 @@ import HomePage from '../components/HomePage.vue'
 import DiyPage from '../components/DiyPageMigrated.vue'
 import DiyPlanList from '../components/DiyPlanList.vue'
 import DiyPlanDetail from '../components/DiyPlanDetailMigrated.vue'
+import OrderCenter from '../components/OrderCenter.vue'
 import AdminDashboard from '../components/AdminDashboard.vue'
 import UserLayout from '../components/UserLayout.vue'
 import AdminLayout from '../components/AdminLayout.vue'
@@ -20,6 +21,7 @@ const routes = [
       { path: '', redirect: '/user/home' },
       { path: 'home', component: HomePage },
       { path: 'diy', component: DiyPage },
+      { path: 'orders', component: OrderCenter },
       { path: 'plans', component: DiyPlanList },
       { path: 'plan/:id', component: DiyPlanDetail }
     ]
