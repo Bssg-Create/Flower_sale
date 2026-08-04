@@ -1,5 +1,39 @@
 # 项目上下文记录
 
+## 2026-08-04（数据库最小权限迁移与本机凭据轮换完成）
+
+### 授权、范围与 Git 起点
+- 用户已明确回复并授权：创建 `flower_app`、授予既定最小权限，并生成新的 JWT/管理员密码放入本机剪贴板。
+- 本阶段开始时分支为 `master`，`HEAD` 与本地 `origin/master` 均为 `82d918697b27482a71abe5e02e39e6c5a0bbdffb`，远端仍为 `https://github.com/Bssg-Create/Flower_sale.git`；不得恢复已回退的 `92b5b80`。
+- 本轮没有修改 Java/Vue 业务代码、前端视觉、路由、接口字段、订单/库存/DIY 流程或数据，没有构建或同步前端 `dist`，没有下载新依赖，也没有修改 MySQL `root` 密码。
+
+### 数据库最小权限迁移
+- 写操作前再次验证仓库外安全备份及授权快照的 SHA-256，均与上一节记录完全一致；备份仍位于 `D:\GProject\flower_trae\flower-sales-local-backups\20260804-131459-security-hardening`，严禁移入仓库或提交 Git。
+- 已创建 `flower_app@localhost`，随机密码只在受控 PowerShell 进程内生成，没有写入文件、日志、聊天、代码或 Git。
+- `flower_app` 仅拥有 `flower_sales.*` 上的 `SELECT、INSERT、UPDATE、DELETE`。通过 `information_schema` 两次独立复查：没有其他 Schema 权限、全局权限、表级额外权限、DDL 权限或 `GRANT OPTION`。
+- 使用剪贴板中的应用密码再次以 `flower_app` 连接并读取 `flower_sales.sys_user` 成功，证明最终交付的 IDEA 配置与实际数据库账号一致。
+- MySQL `root` 原连接在最终审计时仍正常，仅用于本次创建账号和授权；没有执行 `ALTER USER root` 或任何 root 密码轮换。root 轮换继续作为必须单独确认、同时考虑 Workbench 和其他项目影响的后续任务。
+
+### JWT 与管理员密码轮换
+- 新的随机 JWT 密钥、`flower_app` 密码和管理员密码均使用系统加密随机数生成器生成；真实值没有落盘或输出。
+- 使用新数据库账号和新 JWT，从四个模块当前离线编译的 `target/classes` 在临时端口 `28081` 启动当前源码成功；未使用旧 target JAR 或本机仓库中的旧业务制品。
+- 复用现有管理员 `PUT /api/user` 更新 `id=1` 的密码。接口返回 HTTP/业务码 200；旧管理员密码随后返回 HTTP 401，新管理员密码返回 HTTP 200，并能继续访问管理员用户、订单和 DIY 接口。
+- 数据库最终密码列严格匹配 BCrypt 60 字符哈希格式，已与轮换前哈希不同，也不等于新密码明文。管理员仍恰好 1 条：`id=1`、用户名 `admin`、`user_type=admin`、状态启用。
+- 本机剪贴板当前包含两部分：可直接粘贴到 IDEA `Flower Backend - Dev` 的三个必需环境变量，以及管理员新密码。用户必须立即把环境变量粘贴到 IDEA，并把管理员密码保存到密码管理工具；剪贴板若被覆盖，数据库中无法反推出随机应用密码，只能再次安全轮换。
+
+### API、数据不变性与日志验证
+- 新账号/JWT 下真实 API 验证通过：管理员登录、`/api/user/list`、`/api/order/list`、`/api/diy/list`、`/api/diy/flowers`、`/api/diy/package/list` 均返回 HTTP/业务码 200；用户列表响应不含 `password` 字段。
+- 轮换前后业务数据数量保持：用户 10、订单 3、订单明细 7、DIY 方案 12、DIY 明细 56、花材 13。
+- 轮换前后花材库存/状态、订单核心字段与 DIY 核心字段的数据库摘要完全一致；除管理员 BCrypt 密码外，没有修改订单、库存、DIY 或其他业务数据。
+- 临时运行日志检查：真实新旧凭据均未出现，`Preparing:=False`、`Parameters:=False`、`BCRYPT_HASH=False`、`Admin bootstrap is disabled=True`、`Started FlowerApplication=True`。
+
+### 构建、清理与下一步
+- 本机继续使用已有 Maven 与 MySQL 客户端，下载量为 0；`mvn -o -q -DskipTests compile` 和 `mvn -o -q test` 均通过。
+- 开始时发现交接阶段遗留的两个 `com.flower.FlowerApplication`：8081/PID 27912、18081/PID 43620，确认主类和启动时间后已精确停止。最终 8081、18081、5173、28081 均未监听。
+- 临时后端 PID 15008 已停止；所有本轮临时日志和类路径文件已删除；受控会话中的数据库/JWT/管理员明文变量已经清除。真实值只保留在本机剪贴板和数据库认证/哈希状态中。
+- 用户下一步应先完成两项本机操作：把剪贴板中的环境变量粘贴到 IDEA `Flower Backend - Dev`；把管理员新密码保存到密码管理工具。之后可用 `Flower Full Stack - Dev` 启动，并访问 `http://127.0.0.1:5173/` 做人工验收。
+- 不要自动修改 MySQL root 密码。若后续需要轮换 root，必须另行说明对 Workbench 和其他项目的影响，再获得独立明确授权。
+
 ## 2026-08-04（敏感配置安全收口代码阶段完成，数据库账号迁移待授权）
 
 ### 当前 Git 与范围
