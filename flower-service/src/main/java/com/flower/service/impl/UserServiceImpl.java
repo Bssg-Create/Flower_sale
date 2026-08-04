@@ -12,6 +12,7 @@ import com.flower.vo.LoginVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -20,10 +21,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public UserServiceImpl(UserMapper userMapper, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserMapper userMapper, BCryptPasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -46,7 +49,7 @@ public class UserServiceImpl implements UserService {
         }
         LoginVo loginVo = new LoginVo();
         BeanUtils.copyProperties(user, loginVo);
-        loginVo.setToken(JwtUtil.createToken(user.getId(), user.getUserType()));
+        loginVo.setToken(jwtUtil.createToken(user.getId(), user.getUserType()));
         return loginVo;
     }
 
@@ -79,6 +82,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean update(User user) {
+        if (StringUtils.hasText(user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        } else {
+            user.setPassword(null);
+        }
         return userMapper.updateById(user) > 0;
     }
 

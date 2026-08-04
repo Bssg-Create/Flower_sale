@@ -51,7 +51,31 @@
 
    `D:\GProject\flower_trae\flower-sales`
 
-6. 不要同时启动两个后端配置，否则可能出现 `8081` 端口被占用。
+6. 在 `Environment variables` 中设置以下本机变量：
+
+   - `FLOWER_JWT_SECRET`：必填，JWT 签名密钥，至少 32 字节。
+   - `SPRING_DATASOURCE_USERNAME`：必填，本机 MySQL 应用账号。
+   - `SPRING_DATASOURCE_PASSWORD`：必填，本机 MySQL 应用账号密码。
+   - `SPRING_DATASOURCE_URL`：选填，用于覆盖默认的本机 `flower_sales` 连接地址。
+
+   可以在本机 PowerShell 中生成随机 JWT 密钥，生成结果只填写到 IDEA，不要写入源码、文档或 Git：
+
+   ```powershell
+   $bytes = New-Object byte[] 32
+   [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+   [Convert]::ToBase64String($bytes)
+   ```
+
+7. 当前数据库已经存在管理员时，不要启用管理员初始化。只有新数据库首次创建管理员时才临时增加：
+
+   - `FLOWER_ADMIN_BOOTSTRAP_ENABLED`：首次创建时设为 `true`，成功后删除或改为 `false`。
+   - `FLOWER_ADMIN_USERNAME`：管理员用户名，未设置时默认为 `admin`。
+   - `FLOWER_ADMIN_PASSWORD`：首次创建使用的管理员密码，至少 8 位。
+
+   管理员已经存在时，初始化器不会修改或重置其密码。
+
+8. IDEA 项目目录下的 `.idea/` 已被 Git 忽略，但仍不要把真实变量值复制到截图、文档、提交信息或其他受 Git 跟踪的文件中。
+9. 不要同时启动两个后端配置，否则可能出现 `8081` 端口被占用。
 
 ### 3.2 新建 Vite 前端运行配置
 
@@ -86,6 +110,8 @@
 5. 保存配置。
 
 以后日常开发时，只选择 `Flower Full Stack - Dev` 并点击运行按钮即可。
+
+组合配置会启动已经设置好环境变量的 `Flower Backend - Dev`，不需要在 `Flower Full Stack - Dev` 中重复填写变量。
 
 ## 4. 日常开发使用方法
 

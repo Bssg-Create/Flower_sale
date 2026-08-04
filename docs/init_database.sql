@@ -183,13 +183,10 @@ INSERT INTO sys_role (role_name, role_code, description) VALUES
 ('管理员', 'admin', '系统管理员'),
 ('普通用户', 'user', '普通用户');
 
--- 插入管理员用户（密码：123456，已加密）
-INSERT INTO sys_user (username, password, phone, email, user_type, status) VALUES 
-('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMye.IjzqAKL9xL5jvMFVdNJHvGCgTq/VEq', '13900000000', 'admin@flower.com', 'admin', '1');
-
--- 关联管理员角色
-INSERT INTO sys_user_role (user_id, role_id) VALUES 
-(1, 1);
+-- 管理员账号不再使用固定密码写入初始化 SQL。
+-- 新数据库首次启动时，请按《IDEA启动与前端同步使用方案.md》设置
+-- FLOWER_ADMIN_BOOTSTRAP_ENABLED、FLOWER_ADMIN_USERNAME 和 FLOWER_ADMIN_PASSWORD，
+-- 由后端仅在管理员不存在时完成一次性创建；创建后应关闭初始化开关。
 
 -- 插入花卉分类数据
 INSERT INTO flower_category (name, description, icon, sort_order) VALUES 

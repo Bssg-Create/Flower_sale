@@ -6,8 +6,10 @@ import com.flower.mapper.*;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
@@ -26,10 +28,16 @@ public class DataInitializer {
     private final FlowerCategoryMapper flowerCategoryMapper;
     private final PackageTypeMapper packageTypeMapper;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final boolean adminBootstrapEnabled;
+    private final String adminUsername;
+    private final String adminPassword;
 
     public DataInitializer(UserMapper userMapper, RoleMapper roleMapper, UserRoleMapper userRoleMapper,
                            FlowerMapper flowerMapper, FlowerCategoryMapper flowerCategoryMapper,
-                           PackageTypeMapper packageTypeMapper, BCryptPasswordEncoder passwordEncoder) {
+                           PackageTypeMapper packageTypeMapper, BCryptPasswordEncoder passwordEncoder,
+                           @Value("${flower.bootstrap.admin.enabled:false}") boolean adminBootstrapEnabled,
+                           @Value("${flower.bootstrap.admin.username:admin}") String adminUsername,
+                           @Value("${flower.bootstrap.admin.password:}") String adminPassword) {
         this.userMapper = userMapper;
         this.roleMapper = roleMapper;
         this.userRoleMapper = userRoleMapper;
@@ -37,12 +45,15 @@ public class DataInitializer {
         this.flowerCategoryMapper = flowerCategoryMapper;
         this.packageTypeMapper = packageTypeMapper;
         this.passwordEncoder = passwordEncoder;
+        this.adminBootstrapEnabled = adminBootstrapEnabled;
+        this.adminUsername = adminUsername;
+        this.adminPassword = adminPassword;
     }
 
     @PostConstruct
     public void init() {
-        initAdminUser();
         initRoles();
+        initAdminUser();
         initCategories();
         initFlowers();
         initPackageTypes();
@@ -74,39 +85,51 @@ public class DataInitializer {
     }
 
     private void initAdminUser() {
+        if (!adminBootstrapEnabled) {
+            log.info("Admin bootstrap is disabled.");
+            return;
+        }
+        if (!StringUtils.hasText(adminUsername)) {
+            throw new IllegalStateException("启用管理员初始化时，管理员用户名不能为空");
+        }
         try {
             LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(User::getUsername, "admin");
+            wrapper.eq(User::getUsername, adminUsername);
             User admin = userMapper.selectOne(wrapper);
 
-            if (admin == null) {
-                log.warn("Admin not found, creating admin/123456 ...");
-                admin = new User();
-                admin.setUsername("admin");
-                admin.setPassword(passwordEncoder.encode("123456"));
-                admin.setPhone("13900000000");
-                admin.setEmail("admin@flower.com");
-                admin.setUserType("admin");
-                admin.setStatus("1");
-                userMapper.insert(admin);
-
-                UserRole ur = new UserRole();
-                ur.setUserId(admin.getId());
-                ur.setRoleId(1L);
-                userRoleMapper.insert(ur);
-
-                log.info("Admin created (id={}).", admin.getId());
-            } else {
-                if (!passwordEncoder.matches("123456", admin.getPassword())) {
-                    admin.setPassword(passwordEncoder.encode("123456"));
-                    userMapper.updateById(admin);
-                    log.info("Admin password reset.");
-                } else {
-                    log.info("Admin OK.");
-                }
+            if (admin != null) {
+                log.info("Admin account already exists; bootstrap skipped.");
+                return;
             }
-        } catch (Exception e) {
+
+            if (!StringUtils.hasText(adminPassword) || adminPassword.length() < 8) {
+                throw new IllegalStateException("启用管理员初始化时，管理员密码长度至少为 8 位");
+            }
+            LambdaQueryWrapper<Role> roleWrapper = new LambdaQueryWrapper<>();
+            roleWrapper.eq(Role::getRoleCode, "admin");
+            Role adminRole = roleMapper.selectOne(roleWrapper);
+            if (adminRole == null) {
+                throw new IllegalStateException("管理员角色不存在，无法初始化管理员账号");
+            }
+
+            admin = new User();
+            admin.setUsername(adminUsername);
+            admin.setPassword(passwordEncoder.encode(adminPassword));
+            admin.setPhone("13900000000");
+            admin.setEmail("admin@flower.com");
+            admin.setUserType("admin");
+            admin.setStatus("1");
+            userMapper.insert(admin);
+
+            UserRole ur = new UserRole();
+            ur.setUserId(admin.getId());
+            ur.setRoleId(adminRole.getId());
+            userRoleMapper.insert(ur);
+
+            log.info("Admin account created (id={}).", admin.getId());
+        } catch (RuntimeException e) {
             log.error("Admin init failed: {}", e.getMessage());
+            throw e;
         }
     }
 
