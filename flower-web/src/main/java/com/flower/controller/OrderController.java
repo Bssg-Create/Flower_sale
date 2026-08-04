@@ -2,11 +2,13 @@ package com.flower.controller;
 
 import com.flower.base.ResponseResult;
 import com.flower.config.AuthContext;
+import com.flower.dto.OrderCreateRequest;
 import com.flower.entity.Order;
 import com.flower.entity.OrderItem;
 import com.flower.exception.BaseException;
 import com.flower.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -18,18 +20,16 @@ public class OrderController {
     public OrderController(OrderService orderService) { this.orderService = orderService; }
 
     @PostMapping
-    public ResponseResult<Order> create(@RequestBody Map<String, Object> params, HttpServletRequest request) {
+    public ResponseResult<Order> create(@Valid @RequestBody OrderCreateRequest params, HttpServletRequest request) {
         Long userId = AuthContext.getUserId(request);
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> itemsMap = (List<Map<String, Object>>) params.get("items");
-        List<OrderItem> items = itemsMap.stream().map(m -> {
+        List<OrderItem> items = params.getItems().stream().map(requestItem -> {
             OrderItem item = new OrderItem();
-            item.setFlowerId(Long.valueOf(m.get("flowerId").toString()));
-            item.setQuantity(Integer.valueOf(m.get("quantity").toString()));
+            item.setFlowerId(requestItem.getFlowerId());
+            item.setQuantity(requestItem.getQuantity());
             return item;
         }).toList();
         return ResponseResult.success(orderService.createOrder(userId, items,
-            (String) params.get("shippingAddress"), (String) params.get("receiverName"), (String) params.get("receiverPhone")));
+            params.getShippingAddress(), params.getReceiverName(), params.getReceiverPhone()));
     }
 
     @GetMapping("/{id}")

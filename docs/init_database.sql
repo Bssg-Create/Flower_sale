@@ -221,23 +221,8 @@ INSERT INTO package_type (name, description, image_url, price) VALUES
 ('长形包装', '简约长形花束包装，时尚现代', '/images/long-pack.png', 12.00),
 ('礼盒包装', '精美礼盒包装，送礼首选', '/images/gift-pack.png', 20.00);
 
--- =============================================
--- 创建存储过程和触发器（可选）
--- =============================================
-
--- 更新订单状态触发器
-DELIMITER //
-CREATE TRIGGER update_order_status AFTER UPDATE ON orders
-FOR EACH ROW
-BEGIN
-    IF NEW.status = 'completed' THEN
-        UPDATE flower f 
-        JOIN order_item oi ON f.id = oi.flower_id
-        SET f.stock = f.stock - oi.quantity
-        WHERE oi.order_id = NEW.id;
-    END IF;
-END //
-DELIMITER ;
+-- 库存由订单服务在创建订单的事务内校验并扣减。
+-- 不再创建订单完成时扣库存的触发器，避免同一订单重复扣减库存。
 
 -- =============================================
 -- 创建视图（可选）

@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface OrderService {
     Order createOrder(Long userId, List<OrderItem> items, String shippingAddress, String receiverName, String receiverPhone);
+    Order createDiyOrder(Long userId, List<OrderItem> items, String packageType, String shippingAddress,
+                         String receiverName, String receiverPhone);
     Order getOrderById(Long id);
     List<Order> listOrdersByUser(Long userId);
     List<Order> listAllOrders();
