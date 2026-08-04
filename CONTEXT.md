@@ -1,5 +1,49 @@
 # 项目上下文记录
 
+## 2026-08-04（敏感配置安全收口代码阶段完成，数据库账号迁移待授权）
+
+### 当前 Git 与范围
+- 项目路径：`D:\GProject\flower_trae\flower-sales`；分支：`master`；远端：`https://github.com/Bssg-Create/Flower_sale.git`。
+- 本阶段开始时 `HEAD` 与 `origin/master` 均为 `f1aeb0c29d155e85e5c632cb7523e44e98e5c6ba`（`Complete order lifecycle and user order center`）；不得恢复已回退的 `92b5b80`。
+- 安全代码提交：`7fd7c27 Harden runtime secrets and admin bootstrap`；本节交接提交完成后，以新对话提示中的最终 `HEAD` 为准。
+- 没有修改前端视觉、路由、接口字段、订单/支付/库存流程、DIY 页面或数据；DIY 拖拽、旋转缩放、包装、模板、一键整理、保存、详情还原和直接下单能力完整保留。没有构建或同步前端 `dist`，没有下载新依赖。
+
+### 已完成的安全代码与文档
+- `flower-common/src/main/java/com/flower/utils/JwtUtil.java` 已改为 Spring Bean，通过 `flower.security.jwt-secret`/`FLOWER_JWT_SECRET` 注入密钥；删除源码固定密钥，密钥少于 32 字节会拒绝启动。Token 字段、HS256、`userId`/`userType` Claims 和 24 小时有效期保持不变。
+- `flower-service/src/main/java/com/flower/service/impl/UserServiceImpl.java` 与 `flower-web/src/main/java/com/flower/config/JwtInterceptor.java` 已改为注入 `JwtUtil`；登录和鉴权接口路径、请求字段与响应结构不变。更换密钥后旧 Token 会失效，需要重新登录。
+- `flower-web/src/main/resources/application.yml` 的数据库用户名和密码已取消源码回退值，必须由 `SPRING_DATASOURCE_USERNAME`、`SPRING_DATASOURCE_PASSWORD` 提供；数据库 URL 仍允许使用原本机默认或通过 `SPRING_DATASOURCE_URL` 覆盖。
+- `flower-web/src/main/java/com/flower/FlowerApplication.java` 在启动最前面校验 JWT、数据库用户名和密码三个必需环境变量，避免 Druid 把未解析占位符当成账号反复重试；错误只报告缺失变量名，不输出值。
+- MyBatis `StdOutImpl` 已改为 `NoLoggingImpl`，登录、JWT 拦截和用户查询不再打印 SQL、参数、整行用户记录或 BCrypt 哈希。
+- `UserServiceImpl.update(User)` 对非空新密码统一 BCrypt 加密，空/空白密码保持原密码；继续复用现有管理员 `PUT /api/user`，未新增路由或字段。
+- `DataInitializer` 默认关闭管理员初始化；角色先于管理员初始化。只有显式设置 `FLOWER_ADMIN_BOOTSTRAP_ENABLED=true` 且目标管理员不存在时才创建，密码至少 8 位，并按 `roleCode=admin` 关联角色；已有管理员永不自动重置密码，日志不输出凭据。
+- `docs/init_database.sql` 已删除固定管理员及固定角色关联插入，改为一次性环境变量引导；`IDEA启动与前端同步使用方案.md` 已增加 JWT、数据库和新库管理员环境变量说明，`Flower Full Stack - Dev` 仍通过配置好的 `Flower Backend - Dev` 一键启动。
+- 新增 `flower-common/src/test/java/com/flower/utils/JwtUtilTest.java`，覆盖同密钥签发/验证、错误密钥拒绝、Claim 读取以及空/过短密钥拒绝。
+
+### 已完成验证与测试清理
+- 本机 Maven 实际离线仓库为 `D:\SjzThree\JiaBao`，设置中 `offline=true`；JUnit、Java JWT、Spring Boot Test 和 MyBatis 均已存在，本轮下载量为 0。
+- `mvn -o -q -DskipTests compile` 和 `mvn -o -q test` 均通过。IDEA 对全部安全改动 Java/YAML 文件检查为 0 个错误；仅保留原有非空注解、`Map.get()` 和未配置 SQL 方言等警告。
+- 未提供环境变量时，IDEA `Flower Backend - Dev` 在连接数据库前以退出码 1 明确返回 `缺少必需环境变量: FLOWER_JWT_SECRET`。
+- 使用仅存在于测试进程内的一次性 JWT 密钥和内部读取但不输出的旧本机数据库连接值，在临时端口 `18081` 启动成功；管理员登录、JWT 签发和受保护 `/api/user/list` 均返回 HTTP 200。
+- 完整运行日志复查：`Preparing:=False`、`Parameters:=False`、`BCRYPT_HASH=False`、`Admin bootstrap is disabled=True`、`Started FlowerApplication=True`。
+- Windows 曾由非 Java 系统句柄占用旧的 `flower-web/target/flower-web-1.0.0.jar`，导致标准重打包无法重命名旧 JAR；没有发现 Java 进程或端口残留。通过临时替代 `finalName` 完成离线可执行 JAR 打包验证（185122381 字节）后已恢复 `pom.xml` 并删除两个替代 JAR。旧 `target` JAR 是被 Git 忽略的构建产物，不会提交；新对话如句柄已释放可再执行标准 `mvn -o -q clean package -DskipTests`。
+- 8081、18081 均已停止；没有临时测试用户、业务数据、脚本或测试服务残留。
+
+### 数据库只读检查、备份与当前授权门槛
+- 数据库至今没有执行任何安全阶段写操作。只读检查确认应用当前使用 `root@localhost`，该账号拥有 `*.*` 上含建库、删库、关库、创建用户、授权在内的完整全局权限，远超应用需要。
+- 当前管理员恰好 1 条：`id=1`、用户名 `admin`、`user_type=admin`、状态启用；旧固定管理员凭据仍可登录。`flower_app@localhost` 不存在。当前业务行数：用户 10、订单 3、DIY 方案 12。
+- 已在 Git 仓库外完成安全改造前备份：`D:\GProject\flower_trae\flower-sales-local-backups\20260804-131459-security-hardening\flower_sales_before_security_hardening.sql`，大小 28800 字节，SHA-256 `424D6AC3FCEB45B1A424A6855004E217B0F4A6A9C5DF579106723A62602BC39D`。
+- 同目录授权快照 `mysql_security_state.txt`，大小 1307 字节，SHA-256 `98652F020ABAC7450A684F175BEBE18FF9386570DDE9CFD9A9DE8BF9CD1B4F91`。两份文件包含权限信息、用户资料或密码哈希，严禁移动进仓库或提交 Git。
+- 用户已经看过拟执行影响，但在发送“开启新对话”前尚未给出数据库写操作的最终明确许可。因此不得创建账号、授权或更新管理员密码；新对话必须先再次获得明确许可。
+
+### 新对话的精确下一步
+1. 完整阅读根目录 `AGENTS.md`、`CONTEXT.md` 和 `IDEA启动与前端同步使用方案.md`，先核对 Git `master`、`HEAD`、`origin/master` 和工作区；不得恢复 `92b5b80`。
+2. 先向用户复述当前门槛，并等待用户明确回复：`允许创建 flower_app、授予上述最小权限，并生成新的 JWT/管理员密码放入本机剪贴板`。获得该许可前只能只读检查，不得写数据库。
+3. 获准后生成不落盘、不输出的随机应用密码与 JWT 密钥；执行 `CREATE USER 'flower_app'@'localhost' IDENTIFIED BY <随机密码>`，仅授予 `flower_sales.*` 上的 `SELECT, INSERT, UPDATE, DELETE`，不得授予 DDL、全局或 `GRANT OPTION` 权限。
+4. 使用新账号和新 JWT 密钥在临时进程验证启动、登录、用户、订单、DIY 等核心读取/写入能力；把 IDEA 所需环境变量和新的管理员密码放到本机剪贴板，不得在聊天、日志、文件或 Git 中显示真实值。用户需要把环境变量粘贴到 `Flower Backend - Dev` 并把管理员密码保存到自己的密码管理工具。
+5. 复用已安全加密的 `PUT /api/user` 轮换现有管理员密码；验证旧密码失败、新密码成功、数据库仍为 BCrypt 哈希，并确认日志不含 SQL 参数或哈希。变更前后不得修改订单、库存、DIY 等业务数据。
+6. 本阶段不要自动修改 MySQL `root` 密码；它会影响 Workbench 和其他本机项目，继续作为需要用户单独确认和本机保存新密码的残余风险。Git 历史中已有旧凭据，删除当前源码不会清除历史，真正失效依赖后续轮换。
+7. 完成获准迁移后，再做完整离线编译/测试、IDEA 启动、真实 API、数据库行数、端口与临时数据清理、敏感信息扫描，更新本节，提交并推送 `master`。
+
 ## 2026-08-04（订单、支付、DIY 状态统一与普通用户订单闭环完成）
 
 ### 数据库备份与迁移
