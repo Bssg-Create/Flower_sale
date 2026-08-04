@@ -1,5 +1,43 @@
 # 项目上下文记录
 
+## 2026-08-04（订单与 DIY 服务端校验及数据一致性第二阶段完成）
+
+### 当前准确状态
+- 项目路径：`D:\GProject\flower_trae\flower-sales`；分支：`master`；确认远端：`https://github.com/Bssg-Create/Flower_sale.git`。
+- 第二阶段功能提交：`4df1f96 Harden order and DIY data consistency`；本节交接记录将随后单独提交，并与功能提交一起推送到 `origin/master`。
+- 本阶段没有修改前端、路由、接口字段、页面业务流程、后端 static 或 `dist`；DIY 拖拽、旋转缩放、包装、模板、一键整理、保存、详情还原和直接下单能力均保持不变。
+- 新增 `spring-boot-starter-validation`；用户已明确允许预计 2–5 MB 下载，实际依赖已写入本机 Maven 缓存并完成编译。
+
+### 已完成的请求校验与错误响应
+- 新增订单、订单明细、DIY 保存、DIY 花材和 DIY 下单五个请求 DTO，替换 `OrderController.create`、`DiyController.save`、`DiyController.placeOrder` 中的原始 `Map` 强制转换。
+- 使用 Bean Validation 校验非空商品、正数花材 ID/数量、收货信息、电话格式、包装名称长度和 `position` 最大长度；错误字段类型和校验失败均返回真实 HTTP `400`。
+- 客户端原有 `userId`、`totalPrice`、`flowerName` 保持请求兼容，但身份继续只取 JWT，DIY 总价和花名不再信任客户端。
+
+### 已完成的订单与库存一致性
+- `FlowerMapper` 新增 `SELECT ... FOR UPDATE` 花材行锁和带 `status='1' AND stock>=quantity` 条件的原子库存扣减。
+- `OrderServiceImpl.createOrder` 会合并普通订单中的重复花材 ID，按 ID 排序加锁，校验花材存在、启用和库存后安全扣减；订单明细花名、单价、小计和订单总额全部使用数据库值重算。
+- 订单、订单明细和库存扣减处于同一事务；不存在花材返回 HTTP `404`，停用/请求错误返回 `400`，库存不足或并发变化返回 `409`。
+- 实际 `flower_sales` 数据库曾存在 `update_order_status` 触发器，会在订单完成时再次扣库存。经用户了解作用并明确许可后，已把无 `DEFINER` 的恢复定义保存到 `docs/update_order_status_trigger.backup.sql`，并删除实际触发器；复查 `LEGACY_TRIGGER=0`。`docs/init_database.sql` 也不再为新数据库创建重复扣库存触发器。
+
+### 已完成的 DIY 服务端重算与统一事务
+- `PackageTypeServiceImpl.getEnabledByCompatibleName` 从数据库查询启用包装，并兼容四组旧包装名与 A 方向新展示名。
+- `DiyBouquetServiceImpl.createBouquet` 使用数据库花名、花价和包装价重算 `totalPrice`；DIY 每枝花材明细及 `position` 仍逐条保存，不会因订单合并而破坏画布还原。
+- 保存 DIY 方案不扣减或预留库存；真正下单时重新检查当前花材状态、库存、花价和包装价。
+- `DiyBouquetServiceImpl.placeOrder` 在统一事务中原子标记方案、创建订单、扣减库存并把方案金额更新为实际订单金额；重复下单返回 HTTP `409`，任一步失败会回滚方案状态、订单、明细和库存。
+- DIY 订单总额已包含数据库包装费；当前订单明细表仍只记录花材，不新增数据库字段或前端接口字段。
+
+### 验证与清理
+- `mvn -q -DskipTests compile` 通过；`mvn -q test` 通过，均无错误输出。
+- 真实 8081 API/MySQL 自动化验证全部通过：DTO/HTTP 400、花材不存在/停用/库存不足、重复花材合并、普通订单数据库计价和扣库存、DIY 花材与包装重算、DIY 下单统一事务、重复下单保护、库存不足时完整回滚。
+- 测试后的数据库复查：`TEMP_USERS=0`、`TEMP_FLOWERS=0`、`TEMP_DIY=0`、`LEGACY_TRIGGER=0`；临时脚本已删除，8081/5173 无测试监听。
+- 敏感信息扫描返回 `SENSITIVE_SCAN_OK`；未新增或提交任何密码、Token、API Key 或数据库凭据。
+
+### 下一阶段边界
+1. 下一阶段再单独设计并确认订单、支付和 DIY 状态统一，以及普通用户模拟支付、取消订单、确认收货闭环；取消订单时需要与本阶段“创建订单即扣库存”规则配套恢复库存。
+2. 状态统一前先检查历史数据，涉及状态批量规范化时先备份并单独获得许可。
+3. JWT 密钥、数据库默认凭据和 `DataInitializer` 固定管理员密码行为仍未处理，继续留作独立安全方案。
+4. 不主动修改前端视觉、路由、接口字段或 DIY 核心功能；日常开发仍运行 IDEA `Flower Full Stack - Dev` 并访问 `http://127.0.0.1:5173/`，当前不要构建或同步 `dist`。
+
 ## 2026-08-01（开启新对话：前端验收通过，后端权限第一阶段完成）
 
 ### 当前准确状态
