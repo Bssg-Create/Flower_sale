@@ -1,5 +1,28 @@
 # 项目上下文记录
 
+## 2026-08-09（8081 单端口答辩包构建与验证完成）
+
+### 用户决定与实施范围
+- 用户确认项目只在本机使用且不传播，明确选择暂不轮换此前截图中出现过的 `FLOWER_JWT_SECRET` 和 `flower_app` 密码，并接受仅限本机使用场景下的残余风险；本轮没有读取或修改 `.idea/flower-sales-dev.env`，也没有修改 MySQL `root` 密码。
+- 用户随后明确批准制作答辩单端口版本。本轮没有修改 Vue/Java 业务源码、数据库、接口、路由、订单/库存/DIY 流程或运行凭据，没有恢复已回退的 `92b5b80`，也没有安装或下载依赖。
+
+### 答辩包构建与静态资源同步
+- 本机继续使用现有 Node `v20.20.2`、npm `10.8.2`、Vite `5.4.21`、Maven `3.9.11` 和 Java 17；`node_modules`、Vue、Vite 与 Maven 离线依赖均已存在，实际下载量为 0。
+- `npm run build` 成功，转换 105 个模块，生成 `assets/index-6qqg9LBY.js`（211545 字节）和 `assets/index-Dx82mHoo.css`（69638 字节）。沙箱内首次执行仍因 esbuild 子进程 `spawn EPERM` 失败，获准在沙箱外使用同一份本地依赖后成功。
+- 新 `dist/index.html` 与上述两个哈希资源已精确同步到 `flower-web/src/main/resources/static`；源/目标 SHA-256 均一致。`static/images` 同步前后均为 45 个文件，没有修改或删除图片；旧哈希资源暂时保留，但新入口不再引用。
+- `flower-frontend/dist` 只作为同步中间产物，验证后已删除；正式提交范围为后端 `static/index.html`、两个新哈希资源和本节交接记录。
+
+### 构建与 8081 单端口验证
+- `mvn -o -q test` 与 `mvn -o -q package -DskipTests` 均通过且无错误输出。生成的 `flower-web/target/flower-web-1.0.0.jar` 为 185212203 字节，JAR 内已确认包含新入口、新 JS 和新 CSS；`target/classes/static` 与源码 static 的入口和两个资源哈希一致。
+- 使用 IDEA `Flower Backend - Dev` 的本机安全环境配置启动后，`8081` 首页返回 HTTP 200，只引用 `/assets/index-6qqg9LBY.js` 和 `/assets/index-Dx82mHoo.css`，不再引用旧哈希，也不包含 `/@vite/client`。
+- 新 JS、CSS 和 `/images/diy/red-rose.webp` 均返回 HTTP 200，资源类型与字节数正确。DIY 花材和包装接口均返回 HTTP/业务码 200，分别为 13 条和 4 条；匿名访问个人订单与 DIY 列表均返回 HTTP 401。
+- 启动日志确认 `Started FlowerApplication` 和 `Tomcat started on port 8081`；ERROR、Exception、MyBatis `Preparing/Parameters`、BCrypt 哈希及敏感环境变量名称命中均为 0。因本轮不读取或使用任何账号凭据，没有执行认证态订单或 DIY 写操作，也没有产生或清理业务测试数据；此前遗留的 1 条未下单临时 DIY 方案保持不变。
+
+### 最终清理与后续使用
+- 验证结束后已停止本轮 IDEA 后端进程，删除本轮 IDEA 临时运行日志；`8081`、`5173`、`18081`、`28081` 均未监听。
+- 日常源码开发仍使用 IDEA `Flower Full Stack - Dev` 并访问 `5173`；毕业答辩可在 IDEA 构建结果保持最新的前提下启动后端并访问 `http://127.0.0.1:8081/`。以后若继续修改 Vue 源码，必须重新执行前端构建和 static 同步，8081 才会更新。
+- `.idea/flower-sales-dev.env` 继续被 Git 忽略且未跟踪，共享 `.run` 配置没有变化。最终敏感扫描与 Git 检查均已通过，答辩包已形成单一本地提交；两次推送已确认的 `origin/master` 均因当前无法连接 `github.com:443` 失败。DNS 可正常解析但 TCP 443 不可达，本地 `master` 暂时领先 `origin/master` 1 个提交；网络恢复后只需重试 `git push origin master`，不要修改远端、重做或回退答辩包。
+
 ## 2026-08-09（开启新对话：DIY 单枝上下移动修复最终交接）
 
 ### 当前状态
