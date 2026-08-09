@@ -76,8 +76,8 @@
       </label>
       <div class="toolbar-actions">
         <button type="button" @click="duplicateSelected">复制</button>
-        <button type="button" @click="shiftLayer(1)">上移</button>
-        <button type="button" @click="shiftLayer(-1)">下移</button>
+        <button type="button" @click="moveSelectedVertically(-1)">上移</button>
+        <button type="button" @click="moveSelectedVertically(1)">下移</button>
         <button type="button" class="danger" @click="removeSelected">删除</button>
       </div>
     </div>
@@ -89,6 +89,7 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 
 const BOARD_W = 560
 const BOARD_H = 600
+const VERTICAL_STEP = 10
 
 const props = defineProps({
   modelValue: { type: Array, default: () => [] },
@@ -261,11 +262,14 @@ const duplicateSelected = () => {
   emitItems(items)
 }
 
-const shiftLayer = (direction) => {
+const moveSelectedVertically = (direction) => {
   if (selectedIndex.value === null) return
   const items = copyItems()
   const item = items[selectedIndex.value]
-  items[selectedIndex.value] = { ...item, z: Number(item.z || 0) + direction * 10 }
+  const currentY = Number(item.y ?? 18)
+  const nextY = clamp(currentY + direction * VERTICAL_STEP, 18, BOARD_H - 220)
+  if (nextY === currentY) return
+  items[selectedIndex.value] = { ...item, y: nextY }
   emitItems(items)
 }
 
