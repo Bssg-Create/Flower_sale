@@ -1,5 +1,56 @@
 # 项目上下文记录
 
+## 2026-08-16（开启新对话：转入零基础项目学习与答辩准备阶段）
+
+### 当前 Git、封版与运行状态
+- 项目路径：`D:\GProject\flower_trae\flower-sales`；分支：`master`；已确认远端：`https://github.com/Bssg-Create/Flower_sale.git`。
+- 上一轮未推送的最终封版交接提交 `d35ae06c2195442ee0838dc4ca2596bb9661c9dc`（`Record final sealed handoff`）已在网络恢复后成功推送。写入本节前 `HEAD` 与 `origin/master` 均为该提交，工作区干净；本次交接提交完成后，以新对话提示词中的最终 `HEAD` 为准。
+- 技术项目继续正式封版：不新增功能、不重做设计、不恢复已回退的 `92b5b80`，只在发现明确缺陷时另行提交完整方案并等待用户批准。
+- 最终答辩版仍为单 JAR、单端口部署：`flower-web/target/flower-web-1.0.0.jar` 存在，Spring Boot 的 `static/index.html` 存在并引用 `/assets/index-6qqg9LBY.js` 与 `/assets/index-Dx82mHoo.css`。
+- IDEA 共享配置 `Flower Backend - Dev` 内部运行 `com.flower.FlowerApplication`，模块为 `flower-web`，并只引用 Git 已忽略的本机 `.idea/flower-sales-dev.env` 路径。该 `.env` 内容没有被读取或输出。
+- 答辩演示可以只运行 `Flower Backend - Dev`（本质上就是运行 `FlowerApplication`）并访问 `http://127.0.0.1:8081/`；它会同时提供构建后的 Vue 页面、图片和 `/api`。不要新建不带环境变量的临时 `FlowerApplication` 配置，否则可能因缺少必需变量启动失败。
+
+### 用户背景与本轮准确需求
+- 用户编程基础较弱，可以按只有少量基础或零基础来设计学习材料；此前完整跟做过 `D:\JavaXiangMu\cangqiong` 苍穹外卖，对其单工程和 Controller/Service/Mapper 方式有一些印象。
+- 用户也接触过中州养老，但不理解 npm 等前端工具；对于模块、技术、依赖包分别解决什么问题尚不熟悉。
+- 用户最关心的不是追求某种架构名词，而是像以前一样运行一个 `FlowerApplication` 就能完整启动，并在毕业答辩时能够讲清项目结构、技术作用、功能实现和数据流，能够应对老师追问。
+- 用户尚未开始开题报告或论文，距离答辩还有半年以上；明确倾向“不做大调整”，并授权 Codex 根据其基础判断最合适的推进方式。
+
+### 三个项目只读对比结论
+- 苍穹外卖实际为单 Maven `war` 工程，Spring Boot `2.1.0.RELEASE`、Java 8、MyBatis，HTML/JS/Vue 脚本直接放在 `src/main/webapp`；约 21 个 Java、7 个 HTML、11 个 JS 文件。结构直观，但技术较旧、页面与后端耦合较强。
+- 中州养老后端实际位于 `D:\tools_two\zzyl\zzyl\zzyl`，由 `zzyl-common/pay/security/service/web` 五个 Maven 模块组成；独立 Vue 3 + Vite + TypeScript 前端位于 `D:\tools_two\vue\vue-zzyl-admin\vue-zzyl-admin`。约 378 个 Java、259 个 Vue、108 个 TypeScript 文件，是三者中最复杂的项目。
+- 花卉系统由 `flower-common/security/service/web` 四个 Maven 模块和 `flower-frontend` 组成，约 68 个 Java、16 个 Vue、4 个前端 JS 文件；后端结构本质上是比中州养老更小、更简单的同类多模块结构。
+- 花卉系统采用“前后端分离开发、单体化集成部署”：开发时 Vue/Vite `5173` 与 Spring Boot `8081` 分工，正式答辩时 Vue 构建产物已经放入 Spring Boot `static`，只运行一个 JAR 和一个 `8081` 端口。
+- 论文和答辩中的准确架构表述应为：`系统采用 Vue 3 + Vite 与 Spring Boot 的前后端分离开发方式，通过 REST API 通信；部署时将前端构建产物集成到 Spring Boot，实现单 JAR、单端口运行。`
+
+### 最终方案判断
+- 不把现有项目重写为苍穹外卖式 `webapp + 普通 HTML/JS`：这会大面积重写 Vue Router、登录状态、用户端、管理端和约 854 行的 DIY 共享画布，回归风险高，并不能保证用户更容易理解。
+- 不合并四个 Maven 模块：模块数量不是当前答辩障碍，合并只会制造无业务价值的结构重构和新的学习成本。
+- 保留现有技术项目和 8081 单端口答辩方式，把重点从“改代码结构”转为“把现有项目翻译成零基础能理解的学习体系”。这是对用户当前基础、半年准备周期和封版状态最合适的方向。
+- `npm` 只需按“前端世界的 Maven”理解：`package.json` 类似 `pom.xml`；`npm run dev` 用于修改前端时启动 5173；`npm run build` 用于把 Vue 源码构建为可集成进 Spring Boot 的静态文件。答辩使用现有 8081 包时通常不需要运行 npm。
+- 后端四模块的零基础类比：`flower-web` 是入口和店铺大门；`flower-service` 是业务大脑；`flower-security` 保存用户/角色相关数据结构；`flower-common` 是公共工具箱；`flower-frontend` 是页面源代码；MySQL 是仓库和账本。
+
+### 建议的学习与答辩准备顺序
+1. 先制作项目总览：目录结构图、启动流程图、最小技术名词表，解释为什么运行 `FlowerApplication` 可以在 8081 打开完整系统，以及 5173/8081 的区别。
+2. 按统一链路学习真实功能：`页面操作 -> Vue 组件 -> Axios -> Controller -> Service -> Mapper -> MySQL -> 返回页面`。
+3. 依次掌握四条答辩核心链：登录与权限；普通商品下单/模拟支付/取消/库存恢复；管理员发货/用户确认收货；DIY 保存/详情还原/直接下单/库存扣减。
+4. 只学习项目真正用到的最低限度原理：Spring Boot、Controller、Service、Mapper/MyBatis-Plus、Entity/DTO/VO、Vue、Axios、Vue Router、JWT、BCrypt、事务、MySQL、npm/Vite。
+5. 再制作论文和答辩材料：系统功能说明、数据库设计/E-R 图、架构与流程图、截图清单、PPT、演示讲稿和常见答辩问答。
+6. 最后进行多轮模拟答辩：5 分钟项目概述、完整现场演示、代码定位、技术选型、权限/库存/事务/DIY 追问和故障预案。
+
+### 新对话精确下一步
+1. 完整阅读根目录 `AGENTS.md`、`CONTEXT.md` 和 `IDEA启动与前端同步使用方案.md`；不得读取 `.idea/flower-sales-dev.env` 内容，不得恢复 `92b5b80`。
+2. 先只读核对最终 Git 状态、四个端口和敏感文件忽略/跟踪状态；不得启动或停止用户进程，除非先确认归属和获得授权。
+3. 下一项任务不是修改业务代码，而是先向用户提交一份完整的《零基础项目熟悉与答辩学习材料制作方案》，列明材料目录、每份材料解决的问题、制作顺序、预计学习成果和验收标准，等待用户明确批准。
+4. 获批后建议从“项目总览、目录作用、FlowerApplication 启动链、npm/Vite 最小解释、5173 与 8081 区别”开始，不要一上来讲复杂源码。
+5. 每个核心功能都制作零基础学习卡，必须引用当前真实文件、接口、数据库表和状态流转，不夸大 AI 助手或未实现功能；重点突出 DIY、订单/模拟支付闭环、权限边界、事务和库存一致性。
+6. 正式创建任何新文件前仍需先获批；完成后独立检查内容准确性、更新本文档、执行不输出真实值的敏感检查、提交并推送 `master`。
+
+### 安全边界
+- 不读取、复述或输出 `.idea/flower-sales-dev.env` 内容；不要求用户把普通用户、管理员或数据库密码发送到聊天。
+- 不把账号密码、Token、JWT 密钥、数据库凭据或密码哈希写入学习材料、论文、日志、截图或 Git；不修改 MySQL `root` 密码。
+- 用户继续选择暂不轮换此前截图中出现过的本机 `FLOWER_JWT_SECRET` 和 `flower_app` 密码，并接受仅限本机场景下的残余风险。
+
 ## 2026-08-09（开启新对话：最终人工彩排通过，项目正式封版）
 
 ### 最终封版状态
